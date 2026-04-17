@@ -2,32 +2,124 @@
 <html>
   <head>
     <title>Red Eye Intake</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 50px auto;
+        line-height: 1.6;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .box {
+        margin-top: 20px;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+
+      .red {
+        background-color: #ffe5e5;
+        color: #cc0000;
+      }
+
+      .green {
+        background-color: #e6ffe6;
+        color: #006600;
+      }
+    </style>
   </head>
+
   <body>
     <h1>Red Eye Intake</h1>
-    <p>This is my first intake tool.</p>
+    <p>Select any symptoms you are experiencing:</p>
 
-    <label>
-      <input type="checkbox" id="visionLoss" />
-      Decreased vision
-    </label>
+    <div class="box">
+      <label>
+        <input type="checkbox" id="visionLoss" />
+        Decreased vision
+      </label>
+      <br />
 
-    <br /><br />
+      <label>
+        <input type="checkbox" id="pain" />
+        Moderate to severe eye pain
+      </label>
+      <br />
+
+      <label>
+        <input type="checkbox" id="light" />
+        Light sensitivity (photophobia)
+      </label>
+      <br />
+
+      <label>
+        <input type="checkbox" id="trauma" />
+        Recent eye trauma
+      </label>
+      <br />
+
+      <label>
+        <input type="checkbox" id="chemical" />
+        Chemical exposure
+      </label>
+      <br />
+
+      <label>
+        <input type="checkbox" id="contactLensPain" />
+        Contact lens use with pain
+      </label>
+    </div>
 
     <button onclick="check()">Submit</button>
 
-    <p id="result"></p>
+    <div id="result"></div>
 
     <script>
       function check() {
         const visionLoss = document.getElementById("visionLoss").checked;
+        const pain = document.getElementById("pain").checked;
+        const light = document.getElementById("light").checked;
+        const trauma = document.getElementById("trauma").checked;
+        const chemical = document.getElementById("chemical").checked;
+        const contactLensPain = document.getElementById(
+          "contactLensPain"
+        ).checked;
 
-        if (visionLoss) {
-          document.getElementById("result").innerText =
-            "See a doctor in person.";
+        const resultBox = document.getElementById("result");
+
+        const isHighRisk =
+          visionLoss ||
+          pain ||
+          light ||
+          trauma ||
+          chemical ||
+          contactLensPain;
+
+        if (isHighRisk) {
+          resultBox.className = "result red";
+          resultBox.innerText =
+            "🚫 Based on your symptoms, please seek in-person eye care as soon as possible.";
         } else {
-          document.getElementById("result").innerText =
-            "You may be okay for telehealth.";
+          resultBox.className = "result green";
+          resultBox.innerText =
+            "✅ You may be a candidate for a virtual eye evaluation.";
         }
       }
     </script>
