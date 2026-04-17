@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Red Eye Intake</title>
+  </head>
+  <body>
+    <h1>Red Eye Intake</h1>
+    <p>This is my first intake tool.</p>
+
+    <label>
+      <input type="checkbox" id="visionLoss" />
+      Decreased vision
+    </label>
+
+    <br /><br />
+
+    <button onclick="check()">Submit</button>
+
+    <p id="result"></p>
+
+    <script>
+      function check() {
+        const visionLoss = document.getElementById("visionLoss").checked;
+
+        if (visionLoss) {
+          document.getElementById("result").innerText =
+            "See a doctor in person.";
+        } else {
+          document.getElementById("result").innerText =
+            "You may be okay for telehealth.";
+        }
+      }
+    </script>
+  </body>
+</html>
