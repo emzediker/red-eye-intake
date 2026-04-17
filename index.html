@@ -7,7 +7,7 @@
       body {
         font-family: Arial, sans-serif;
         max-width: 500px;
-        margin: 50px auto;
+        margin: 40px auto;
         line-height: 1.6;
       }
 
@@ -15,16 +15,20 @@
         text-align: center;
       }
 
-      .box {
-        margin-top: 20px;
+      .step {
+        display: none;
+      }
+
+      .active {
+        display: block;
       }
 
       button {
         margin-top: 20px;
         padding: 10px;
         font-size: 16px;
-        cursor: pointer;
         width: 100%;
+        cursor: pointer;
       }
 
       .result {
@@ -48,78 +52,88 @@
 
   <body>
     <h1>Red Eye Intake</h1>
-    <p>Select any symptoms you are experiencing:</p>
 
-    <div class="box">
-      <label>
-        <input type="checkbox" id="visionLoss" />
-        Decreased vision
-      </label>
-      <br />
+    <!-- STEP 1 -->
+    <div id="step1" class="step active">
+      <p><strong>Step 1: Basic Symptoms</strong></p>
 
-      <label>
-        <input type="checkbox" id="pain" />
-        Moderate to severe eye pain
-      </label>
-      <br />
+      <label><input type="checkbox" id="visionLoss" /> Decreased vision</label><br />
+      <label><input type="checkbox" id="pain" /> Moderate to severe pain</label><br />
+      <label><input type="checkbox" id="light" /> Light sensitivity</label><br />
 
-      <label>
-        <input type="checkbox" id="light" />
-        Light sensitivity (photophobia)
-      </label>
-      <br />
-
-      <label>
-        <input type="checkbox" id="trauma" />
-        Recent eye trauma
-      </label>
-      <br />
-
-      <label>
-        <input type="checkbox" id="chemical" />
-        Chemical exposure
-      </label>
-      <br />
-
-      <label>
-        <input type="checkbox" id="contactLensPain" />
-        Contact lens use with pain
-      </label>
+      <button onclick="nextStep(2)">Next</button>
     </div>
 
-    <button onclick="check()">Submit</button>
+    <!-- STEP 2 -->
+    <div id="step2" class="step">
+      <p><strong>Step 2: Risk Factors</strong></p>
 
+      <label><input type="checkbox" id="trauma" /> Recent trauma</label><br />
+      <label><input type="checkbox" id="chemical" /> Chemical exposure</label><br />
+      <label><input type="checkbox" id="contactLensPain" /> Contact lens use with pain</label><br />
+
+      <button onclick="nextStep(3)">Next</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" class="step">
+      <p><strong>Step 3: Symptom Type</strong></p>
+
+      <label><input type="radio" name="symptomType" value="itching" /> Itching</label><br />
+      <label><input type="radio" name="symptomType" value="painful" /> Painful</label><br />
+
+      <p><strong>Discharge:</strong></p>
+      <label><input type="radio" name="discharge" value="watery" /> Watery</label><br />
+      <label><input type="radio" name="discharge" value="thick" /> Thick / pus</label><br />
+
+      <button onclick="runTriage()">Submit</button>
+    </div>
+
+    <!-- RESULT -->
     <div id="result"></div>
 
     <script>
-      function check() {
+      function nextStep(step) {
+        document.querySelectorAll(".step").forEach((el) => el.classList.remove("active"));
+        document.getElementById("step" + step).classList.add("active");
+      }
+
+      function runTriage() {
         const visionLoss = document.getElementById("visionLoss").checked;
         const pain = document.getElementById("pain").checked;
         const light = document.getElementById("light").checked;
         const trauma = document.getElementById("trauma").checked;
         const chemical = document.getElementById("chemical").checked;
-        const contactLensPain = document.getElementById(
-          "contactLensPain"
-        ).checked;
+        const contactLensPain = document.getElementById("contactLensPain").checked;
+
+        const symptomType = document.querySelector('input[name="symptomType"]:checked')?.value;
+        const discharge = document.querySelector('input[name="discharge"]:checked')?.value;
 
         const resultBox = document.getElementById("result");
 
-        const isHighRisk =
-          visionLoss ||
-          pain ||
-          light ||
-          trauma ||
-          chemical ||
-          contactLensPain;
+        const highRisk =
+          visionLoss || pain || light || trauma || chemical || contactLensPain;
 
-        if (isHighRisk) {
+        if (highRisk) {
           resultBox.className = "result red";
           resultBox.innerText =
-            "🚫 Based on your symptoms, please seek in-person eye care as soon as possible.";
-        } else {
+            "🚫 Please seek in-person eye care as soon as possible.";
+          return;
+        }
+
+        // Clinical logic layer
+        if (symptomType === "itching" && discharge === "watery") {
           resultBox.className = "result green";
           resultBox.innerText =
-            "✅ You may be a candidate for a virtual eye evaluation.";
+            "✅ Likely allergic conjunctivitis. You may be a candidate for virtual care.";
+        } else if (symptomType === "painful" && discharge === "thick") {
+          resultBox.className = "result green";
+          resultBox.innerText =
+            "✅ Possible bacterial conjunctivitis. Virtual care may be appropriate.";
+        } else {
+          resultBox.className = "result red";
+          resultBox.innerText =
+            "⚠️ Your symptoms are unclear. In-person evaluation is recommended.";
         }
       }
     </script>
