@@ -25,19 +25,23 @@
     .checkbox-group label {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 0;
+      gap: 6px;
+      padding: 6px 0;
       cursor: pointer;
     }
 
     input[type="checkbox"] {
-      transform: scale(1.2);
+      transform: scale(1.1);
     }
 
     input, textarea, select {
       width: 100%;
       margin-bottom: 15px;
       padding: 10px;
+    }
+
+    textarea {
+      min-height: 80px;
     }
 
     button {
@@ -121,7 +125,7 @@
   <p><b>Patient Information</b></p>
 
   <label>Chief Complaint</label>
-  <textarea id="cc"></textarea>
+  <textarea id="cc" placeholder="Describe your symptoms"></textarea>
 
   <label>Duration</label>
   <select id="duration">
@@ -150,11 +154,14 @@
 
   <input type="text" placeholder="Other medical history">
 
+  <label>Current Medications</label>
+  <textarea placeholder="List current medications"></textarea>
+
   <label>Medication Allergies</label>
-  <input type="text">
+  <input type="text" placeholder="List medication allergies">
 
   <label>Family Medical History</label>
-  <input type="text">
+  <input type="text" placeholder="Optional">
 
   <button onclick="submitForm()">Submit</button>
 </div>
@@ -166,7 +173,7 @@
 
 function nextStep(step){
 
-  // 🚫 EARLY STOP (only red flags)
+  // 🚫 EARLY STOP (red flags only)
   if(step === 4){
     const highRisk =
       document.getElementById("visionLoss").checked ||
@@ -192,7 +199,6 @@ function nextStep(step){
 }
 
 function submitForm(){
-
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
   document.getElementById("result").className="result green";
