@@ -18,7 +18,7 @@ h1 { text-align:center; }
   margin-bottom:6px;
 }
 
-textarea,input { width:100%; margin-bottom:12px; padding:8px; }
+textarea,input,select { width:100%; margin-bottom:12px; padding:8px; }
 button { width:100%; padding:12px; margin-top:10px; }
 
 .result { padding:15px; border-radius:8px; }
@@ -49,7 +49,14 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-const doctorName = "Dr. Your Name, OD"; // 👈 EDIT THIS
+// ✅ PROVIDERS + NPI
+const providers = {
+  "Emily Zediker, OD": { npi: "1790349074" },
+  "Sophia Brown, OD": { npi: "1750279949" }
+};
+
+let doctorName = "Emily Zediker, OD";
+let currentIndex = null;
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
@@ -239,14 +246,25 @@ document.getElementById("app").innerHTML=html;
 
 function openChart(i){
 
+currentIndex = i;
+
 let p = JSON.parse(localStorage.getItem("patients"))[i];
 
-// PDF NAME
 let cleanName = p.name.replace(/\s+/g, "_");
 let date = new Date().toISOString().split("T")[0];
 document.title = cleanName + "_" + date;
 
+let doctorSelector = `
+<label><b>Select Provider:</b></label>
+<select id="doctorSelect" onchange="updateDoctor()">
+  <option value="Emily Zediker, OD">Emily Zediker, OD</option>
+  <option value="Sophia Brown, OD">Sophia Brown, OD</option>
+</select><br><br>
+`;
+
 document.getElementById("app").innerHTML=`
+
+${doctorSelector}
 
 <div class="print-container">
 
@@ -288,7 +306,8 @@ Telehealth evaluation
 <div class="signature">
 <br><br>
 _________________________<br>
-${doctorName}
+${doctorName}<br>
+NPI: ${providers[doctorName].npi}
 </div>
 
 <button onclick="window.print()">Print / Save PDF</button>
@@ -296,6 +315,12 @@ ${doctorName}
 
 </div>
 `;
+}
+
+// ✅ update provider + refresh chart
+function updateDoctor(){
+  doctorName = document.getElementById("doctorSelect").value;
+  openChart(currentIndex);
 }
 
 function removePatient(index){
