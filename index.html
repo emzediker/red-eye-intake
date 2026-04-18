@@ -22,7 +22,7 @@
     .step { display: none; }
     .active { display: block; }
 
-    /* 🔥 BULLETPROOF CHECKBOX LAYOUT */
+    /* ✅ STABLE CHECKBOX GRID (DO NOT TOUCH) */
     .check-row {
       display: grid;
       grid-template-columns: 20px auto;
@@ -166,8 +166,18 @@
   <label>Medication Allergies</label>
   <input type="text">
 
-  <label>Family Medical History</label>
-  <input type="text">
+  <!-- ✅ FAMILY HISTORY CHECKLIST -->
+  <label><b>Family Medical History</b></label>
+
+  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
+  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
+  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
+  <div class="check-row"><input type="checkbox"><span>Eye disease (glaucoma, macular degeneration)</span></div>
+  <div class="check-row"><input type="checkbox"><span>None</span></div>
+
+  <input type="text" placeholder="Other family history">
 
   <button onclick="submitForm()">Submit</button>
 </div>
