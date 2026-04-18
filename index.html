@@ -64,6 +64,12 @@
       border-radius:8px;
       font-size:14px;
     }
+
+    .provider-btn {
+      background:#333;
+      color:#fff;
+      margin-top:20px;
+    }
   </style>
 </head>
 
@@ -147,6 +153,28 @@
     <option>Yes</option>
   </select>
 
+  <label><b>Medical History</b></label>
+  <div class="check-row"><input type="checkbox" id="mh_diabetes"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_htn"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_chol"><span>High cholesterol</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_cancer"><span>Cancer</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_autoimmune"><span>Autoimmune disease</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_none"><span>None</span></div>
+  <input type="text" id="mh_other" placeholder="Other medical history">
+
+  <label>Current Medications</label>
+  <textarea id="meds"></textarea>
+
+  <label>Medication Allergies</label>
+  <input type="text" id="allergies">
+
+  <label><b>Family Medical History</b></label>
+  <div class="check-row"><input type="checkbox" id="fh_diabetes"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_htn"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_eye"><span>Eye disease</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_none"><span>None</span></div>
+  <input type="text" id="fh_other" placeholder="Other family history">
+
   <button onclick="submitForm()">Submit</button>
 </div>
 
@@ -160,7 +188,6 @@ let patient = {};
 function validateContact(){
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
-  const email = document.getElementById("email").value.trim();
 
   if(!name || !phone){
     alert("Please enter your name and phone.");
@@ -169,7 +196,6 @@ function validateContact(){
 
   patient.name = name;
   patient.phone = phone;
-  patient.email = email;
 
   nextStep(2);
 }
@@ -197,10 +223,23 @@ function nextStep(step){
 }
 
 function submitForm(){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
-  const cc = document.getElementById("cc").value;
+  result.innerHTML = `
+    <div class="result green">
+      ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
+      <button onclick="joinNow()">Join Now</button>
+      <button class="provider-btn" onclick="generateChart()">Provider: Generate Chart</button>
+    </div>`;
+}
+
+function generateChart(){
+
+  const cc = cc = document.getElementById("cc").value;
   const duration = document.getElementById("duration").value;
   const contacts = document.getElementById("contacts").value;
+  const meds = document.getElementById("meds").value;
+  const allergies = document.getElementById("allergies").value;
 
   let symptoms = [];
   if(redness.checked) symptoms.push("Red eye");
@@ -209,55 +248,29 @@ function submitForm(){
   if(lidBump.checked) symptoms.push("Stye/lid bump");
   if(irritation.checked) symptoms.push("Irritation");
 
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.body.innerHTML = `
+    <h2>Medical Record</h2>
 
-  result.innerHTML = `
-    <div class="result green">
-      ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
+    <b>Name:</b> ${patient.name}<br>
+    <b>Phone:</b> ${patient.phone}<br>
+    <b>Date:</b> ${new Date().toLocaleDateString()}<br><br>
 
-      <h3>Medical Record</h3>
+    <b>Chief Complaint:</b><br>${cc}<br><br>
 
-      <div id="chart" style="text-align:left; background:#fff; padding:15px; border:1px solid #ccc">
+    <b>Symptoms:</b><br>${symptoms.join(", ")}<br><br>
 
-        <b>Name:</b> ${patient.name}<br>
-        <b>Phone:</b> ${patient.phone}<br>
-        <b>Date:</b> ${new Date().toLocaleDateString()}<br><br>
+    <b>Duration:</b> ${duration}<br>
+    <b>Contact Lens:</b> ${contacts}<br><br>
 
-        <b>Chief Complaint:</b><br>
-        ${cc}<br><br>
+    <b>Medications:</b><br>${meds}<br><br>
+    <b>Allergies:</b><br>${allergies}<br><br>
 
-        <b>Duration:</b> ${duration}<br>
-        <b>Contact Lens:</b> ${contacts}<br><br>
+    <b>Assessment:</b><br><textarea></textarea><br><br>
+    <b>Plan:</b><br><textarea></textarea><br><br>
+    <b>Follow-Up:</b><br><textarea></textarea><br><br>
 
-        <b>Symptoms:</b><br>
-        ${symptoms.join(", ") || "None listed"}<br><br>
-
-        <b>Assessment:</b><br>
-        <textarea id="assessment"></textarea><br><br>
-
-        <b>Plan:</b><br>
-        <textarea id="plan"></textarea><br><br>
-
-        <b>Follow-Up:</b><br>
-        <textarea id="followup"></textarea><br><br>
-
-      </div>
-
-      <button onclick="printChart()">Print / Save PDF</button><br><br>
-      <button onclick="joinNow()">Join Now</button>
-
-    </div>
+    <button onclick="window.print()">Print</button>
   `;
-}
-
-function printChart(){
-  const content = document.getElementById("chart").innerHTML;
-  const win = window.open('', '', 'width=800,height=600');
-  win.document.write('<html><head><title>Medical Record</title></head><body>');
-  win.document.write(content);
-  win.document.write('</body></html>');
-  win.document.close();
-  win.print();
 }
 
 function joinNow(){
