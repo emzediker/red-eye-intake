@@ -23,24 +23,21 @@
     .active { display: block; }
 
     .checkbox-group label {
-      display: block;
-      padding: 8px;
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
       cursor: pointer;
     }
 
-    .checkbox-group label:hover {
-      background: #f5f5f5;
-    }
-
     input[type="checkbox"] {
-      margin-right: 10px;
+      transform: scale(1.2);
     }
 
     input, textarea, select {
       width: 100%;
       margin-bottom: 15px;
-      padding: 8px;
+      padding: 10px;
     }
 
     button {
@@ -48,6 +45,9 @@
       width: 100%;
       margin-top: 10px;
       cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background: #e0e0e0;
     }
 
     .result {
@@ -88,12 +88,12 @@
   <p><b>What symptoms are you experiencing?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="redness" onclick="handleNone('symptoms')"> Red eye</label>
-    <label><input type="checkbox" id="itching" onclick="handleNone('symptoms')"> Itching</label>
-    <label><input type="checkbox" id="discharge" onclick="handleNone('symptoms')"> Discharge</label>
-    <label><input type="checkbox" id="lidBump" onclick="handleNone('symptoms')"> Stye / lid bump</label>
-    <label><input type="checkbox" id="irritation" onclick="handleNone('symptoms')"> Irritation</label>
-    <label><input type="checkbox" id="noneSymptoms" onclick="handleNone('symptoms')"> None of the above</label>
+    <label><input type="checkbox" id="redness"> Red eye</label>
+    <label><input type="checkbox" id="itching"> Itching</label>
+    <label><input type="checkbox" id="discharge"> Discharge</label>
+    <label><input type="checkbox" id="lidBump"> Stye / lid bump</label>
+    <label><input type="checkbox" id="irritation"> Irritation</label>
+    <label><input type="checkbox" id="noneSymptoms"> None of the above</label>
   </div>
 
   <button onclick="nextStep(3)">Next</button>
@@ -104,19 +104,19 @@
   <p><b>Do you have any of the following?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="visionLoss" onclick="handleNone('redflags')"> Vision loss</label>
-    <label><input type="checkbox" id="pain" onclick="handleNone('redflags')"> Severe pain</label>
-    <label><input type="checkbox" id="light" onclick="handleNone('redflags')"> Light sensitivity</label>
-    <label><input type="checkbox" id="trauma" onclick="handleNone('redflags')"> Trauma</label>
-    <label><input type="checkbox" id="chemical" onclick="handleNone('redflags')"> Chemical exposure</label>
-    <label><input type="checkbox" id="contactLensPain" onclick="handleNone('redflags')"> Contact lens pain</label>
-    <label><input type="checkbox" id="noneRedFlags" onclick="handleNone('redflags')"> None of the above</label>
+    <label><input type="checkbox" id="visionLoss"> Vision loss</label>
+    <label><input type="checkbox" id="pain"> Severe pain</label>
+    <label><input type="checkbox" id="light"> Light sensitivity</label>
+    <label><input type="checkbox" id="trauma"> Trauma</label>
+    <label><input type="checkbox" id="chemical"> Chemical exposure</label>
+    <label><input type="checkbox" id="contactLensPain"> Contact lens pain</label>
+    <label><input type="checkbox" id="noneRedFlags"> None of the above</label>
   </div>
 
   <button onclick="nextStep(4)">Next</button>
 </div>
 
-<!-- STEP 4 (ONLY IF SAFE) -->
+<!-- STEP 4 -->
 <div id="step4" class="step">
   <p><b>Patient Information</b></p>
 
@@ -156,7 +156,7 @@
   <label>Family Medical History</label>
   <input type="text">
 
-  <button onclick="showResult()">Submit</button>
+  <button onclick="submitForm()">Submit</button>
 </div>
 
 <!-- RESULT -->
@@ -166,7 +166,7 @@
 
 function nextStep(step){
 
-  // 🚫 EARLY STOP AFTER RED FLAGS ONLY
+  // 🚫 EARLY STOP (only red flags)
   if(step === 4){
     const highRisk =
       document.getElementById("visionLoss").checked ||
@@ -179,12 +179,10 @@ function nextStep(step){
     if(highRisk){
       document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
-      const resultBox = document.getElementById("result");
-      resultBox.className="result red";
-      resultBox.innerHTML=`
-        🚫 Your symptoms suggest you should be evaluated in person.<br><br>
-        Telehealth is not appropriate for this condition.
-      `;
+      document.getElementById("result").className="result red";
+      document.getElementById("result").innerHTML=
+        "🚫 You should be evaluated in person based on your symptoms.";
+
       return;
     }
   }
@@ -193,62 +191,15 @@ function nextStep(step){
   document.getElementById("step"+step).classList.add("active");
 }
 
+function submitForm(){
 
-function handleNone(group){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
-  if(group==="symptoms"){
-    const none=document.getElementById("noneSymptoms");
-    const boxes=["redness","itching","discharge","lidBump","irritation"];
-
-    if(none.checked){
-      boxes.forEach(id=>document.getElementById(id).checked=false);
-    } else {
-      boxes.forEach(id=>{
-        if(document.getElementById(id).checked){
-          none.checked=false;
-        }
-      });
-    }
-  }
-
-  if(group==="redflags"){
-    const none=document.getElementById("noneRedFlags");
-    const boxes=["visionLoss","pain","light","trauma","chemical","contactLensPain"];
-
-    if(none.checked){
-      boxes.forEach(id=>document.getElementById(id).checked=false);
-    } else {
-      boxes.forEach(id=>{
-        if(document.getElementById(id).checked){
-          none.checked=false;
-        }
-      });
-    }
-  }
-}
-
-
-function showResult(){
-
-  const hasSymptoms =
-    document.getElementById("redness").checked ||
-    document.getElementById("itching").checked ||
-    document.getElementById("discharge").checked ||
-    document.getElementById("lidBump").checked ||
-    document.getElementById("irritation").checked ||
-    document.getElementById("noneSymptoms").checked; // <-- allowed
-
-  const resultBox=document.getElementById("result");
-
-  if(hasSymptoms){
-    document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-
-    resultBox.className="result green";
-    resultBox.innerHTML=`
-      ✅ You are a candidate for virtual eye care.<br><br>
-      <button onclick="joinNow()">Join Now</button>
-    `;
-  }
+  document.getElementById("result").className="result green";
+  document.getElementById("result").innerHTML=`
+    ✅ You are a candidate for virtual care.<br><br>
+    <button onclick="joinNow()">Join Now</button>
+  `;
 }
 
 function joinNow(){
