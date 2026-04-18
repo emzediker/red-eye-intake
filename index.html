@@ -33,21 +33,10 @@ button { width:100%; padding:12px; margin-top:10px; }
   cursor:pointer;
 }
 
-/* SOAP styling */
-.soap-section {
-  margin-bottom:20px;
-}
-
-.soap-title {
-  font-weight:bold;
-  border-bottom:1px solid #000;
-  margin-bottom:6px;
-}
-
-.print-container {
-  max-width:700px;
-  margin:auto;
-}
+.soap-section { margin-bottom:20px; }
+.soap-title { font-weight:bold; border-bottom:1px solid #000; margin-bottom:6px; }
+.print-container { max-width:700px; margin:auto; }
+.signature { margin-top:40px; }
 </style>
 </head>
 
@@ -59,6 +48,8 @@ button { width:100%; padding:12px; margin-top:10px; }
 <div id="app"></div>
 
 <script>
+
+const doctorName = "Dr. Your Name, OD"; // 👈 EDIT THIS
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
@@ -250,7 +241,13 @@ function openChart(i){
 
 let p = JSON.parse(localStorage.getItem("patients"))[i];
 
+// PDF NAME
+let cleanName = p.name.replace(/\s+/g, "_");
+let date = new Date().toISOString().split("T")[0];
+document.title = cleanName + "_" + date;
+
 document.getElementById("app").innerHTML=`
+
 <div class="print-container">
 
 <h2>Medical Record</h2>
@@ -288,17 +285,21 @@ Telehealth evaluation
 <textarea></textarea>
 </div>
 
-<button onclick="window.print()">Print</button>
+<div class="signature">
+<br><br>
+_________________________<br>
+${doctorName}
+</div>
+
+<button onclick="window.print()">Print / Save PDF</button>
 <button onclick="removePatient(${i})">Remove Patient</button>
 
 </div>
 `;
 }
 
-// ✅ confirmation added
 function removePatient(index){
   if(!confirm("Are you sure you want to remove this patient?")) return;
-
   let patients = JSON.parse(localStorage.getItem("patients")) || [];
   patients.splice(index, 1);
   localStorage.setItem("patients", JSON.stringify(patients));
