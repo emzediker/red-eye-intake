@@ -258,7 +258,16 @@ document.getElementById("app").innerHTML=`
 <b>Follow-Up:</b><br><textarea></textarea><br><br>
 
 <button onclick="window.print()">Print</button>
+<button onclick="removePatient(${i})">Remove Patient</button>
 `;
+}
+
+// ✅ NEW FUNCTION (only addition)
+function removePatient(index){
+  let patients = JSON.parse(localStorage.getItem("patients")) || [];
+  patients.splice(index, 1);
+  localStorage.setItem("patients", JSON.stringify(patients));
+  loadProvider();
 }
 
 function join(){
