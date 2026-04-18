@@ -49,49 +49,50 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-// ================= GLOBAL =================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec";
+
+const providers = {
+  "Emily Zediker, OD": { npi: "1790349074" },
+  "Sophia Brown, OD": { npi: "1750279949" }
+};
+
+let doctorName = "Emily Zediker, OD";
 let sheetPatients = [];
 let currentIndex = null;
+let patient = {};
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
-let patient={};
 
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
-// ================= PATIENT =================
+//////////////////// PATIENT ////////////////////
 
 function loadPatient(){
 document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step1">
-
 <div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
-This tool helps determine if your condition is appropriate for telehealth.
 If you have pain, light sensitivity, or vision loss, you should be seen in person.
 </div>
 
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
-
 <button onclick="validate()">Next</button>
 </div>
 
 <div class="step" id="step2">
-<p><b>Symptoms</b></p>
-
+<b>Symptoms</b>
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
 ${cb("lid","Stye / lid bump")}
 ${cb("irritation","Irritation")}
 ${cb("noneSymptoms","None of the above")}
-
 <button onclick="next(3)">Next</button>
 </div>
 
 <div class="step" id="step3">
-<p><b>Do you have any of the following symptoms?</b></p>
-
+<b>Serious Symptoms</b>
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
 ${cb("light","Light sensitivity")}
@@ -99,19 +100,17 @@ ${cb("trauma","Trauma")}
 ${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
 ${cb("noneRF","None of the above")}
-
 <button onclick="next(4)">Next</button>
 </div>
 
 <div class="step" id="step4">
-
 <textarea id="cc" placeholder="Chief Complaint"></textarea>
 
-<p><b>Medical History</b></p>
+<b>Medical History</b>
 ${medHx("mh_")}
 <input id="mh_other" placeholder="Other medical history">
 
-<p><b>Family History</b></p>
+<b>Family History</b>
 ${medHx("fh_")}
 <input id="fh_other" placeholder="Other family history">
 
@@ -142,75 +141,84 @@ ${cb(prefix+"none","None")}
 }
 
 function validate(){
-const name=document.getElementById("name").value;
-const phone=document.getElementById("phone").value;
-
-if(!name||!phone){alert("Enter info");return;}
-
-patient.name=name;
-patient.phone=phone;
-
+if(!name.value || !phone.value){ alert("Enter info"); return; }
+patient.name = name.value;
+patient.phone = phone.value;
 next(2);
 }
 
 function next(step){
-
 if(step===4){
 if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
-document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
+document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care required</div>";
 return;
 }}
-
 document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
 }
 
-// ================= SUBMIT =================
-
 function submitForm(){
 
-fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
-  method: "POST",
-  body: JSON.stringify({
-    name: patient.name,
-    phone: patient.phone,
-    cc: cc.value,
-    symptoms: "",
-    medHx: "",
-    famHx: "",
-    meds: meds.value,
-    allergies: allergies.value
-  })
+function collect(prefix){
+let arr=[];
+["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
+if(document.getElementById(prefix+x).checked){arr.push(x);}
+});
+return arr;
+}
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+name:patient.name,
+phone:patient.phone,
+cc:cc.value,
+symptoms:"", 
+medHx:collect("mh_").join(", "),
+famHx:collect("fh_").join(", "),
+meds:meds.value,
+allergies:allergies.value
+})
 });
 
 document.getElementById("app").innerHTML=`
 <div class="result green">
-✅ Submitted
+✅ Submitted<br><br>
+<button onclick="join()">Join Visit</button>
 </div>`;
 }
 
-// ================= PROVIDER =================
+function join(){
+window.location.href="https://doxy.me/YOURROOM";
+}
+
+//////////////////// PROVIDER ////////////////////
 
 function loadProvider(){
 
-fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec")
+fetch(SCRIPT_URL)
 .then(res=>res.json())
 .then(patients=>{
 
-if(!patients.length){
-document.getElementById("app").innerHTML="No patients";
+if(!patients || patients.length===0){
+document.getElementById("app").innerHTML="No patients yet";
 return;
 }
 
-sheetPatients=patients;
+sheetPatients = patients;
 
 let html="<h2>Patient Queue</h2>";
 
 patients.forEach((p,i)=>{
+let name = p.name || p.Name || "";
+let phone = p.phone || p.Phone || "";
+let time = p.time || p.Time || "";
+
 html+=`
 <div class="card" onclick="openChart(${i})">
-<b>${p.Name||p.name}</b><br>
-${p.Phone||p.phone}
+<b>${name}</b><br>
+${phone}<br>
+${time}
 </div>`;
 });
 
@@ -221,17 +229,77 @@ document.getElementById("app").innerHTML=html;
 
 function openChart(i){
 
-currentIndex=i;
-let p=sheetPatients[i];
+currentIndex = i;
+let p = sheetPatients[i];
+
+let name = p.name || p.Name || "";
+let phone = p.phone || p.Phone || "";
+let time = p.time || p.Time || "";
+let cc = p.cc || p.CC || "";
+let medHx = p.medHx || p.MedHx || "";
+let famHx = p.famHx || p.FamHx || "";
+let meds = p.meds || p.Meds || "";
+let allergies = p.allergies || p.Allergies || "";
+
+document.title = name.replace(/\s+/g,"_");
 
 document.getElementById("app").innerHTML=`
+
+<div class="print-container">
+
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${p.Name||p.name}<br>
-<b>Phone:</b> ${p.Phone||p.phone}<br>
+<b>Name:</b> ${name}<br>
+<b>Phone:</b> ${phone}<br>
+<b>Date:</b> ${time}<br><br>
 
+<div class="soap-section">
+<div class="soap-title">S: Subjective</div>
+${cc}
+</div>
+
+<div class="soap-section">
+<div class="soap-title">O: Objective</div>
+<textarea></textarea>
+</div>
+
+<div class="soap-section">
+<div class="soap-title">A: Assessment</div>
+
+<select id="icdSelect">
+<option>H10.3 Acute conjunctivitis</option>
+<option>H10.45 Chronic allergic conjunctivitis</option>
+<option>H00.19 Chalazion</option>
+<option>H57.1 Ocular pain</option>
+</select>
+
+<textarea id="assessmentBox"></textarea>
+
+</div>
+
+<div class="soap-section">
+<div class="soap-title">P: Plan</div>
+<textarea></textarea>
+</div>
+
+<div class="signature">
+_________________________<br>
+${doctorName}<br>
+NPI: ${providers[doctorName].npi}
+</div>
+
+<button onclick="window.print()">Print</button>
+<button onclick="removePatient()">Remove</button>
 <button onclick="loadProvider()">Back</button>
+
+</div>
 `;
+}
+
+function removePatient(){
+if(!confirm("Remove patient?")) return;
+sheetPatients.splice(currentIndex,1);
+loadProvider();
 }
 
 </script>
