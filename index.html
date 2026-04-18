@@ -175,25 +175,38 @@ if(document.getElementById(prefix+x).checked){arr.push(x);}
 return arr;
 }
 
+const payload = {
+name: patient.name,
+phone: patient.phone,
+cc: document.getElementById("cc").value,
+symptoms: "",
+medHx: collect("mh_").join(", "),
+famHx: collect("fh_").join(", "),
+meds: document.getElementById("meds").value,
+allergies: document.getElementById("allergies").value
+};
+
 fetch(SCRIPT_URL,{
 method:"POST",
-body:JSON.stringify({
-name:patient.name,
-phone:patient.phone,
-cc:cc.value,
-symptoms:"", 
-medHx:collect("mh_").join(", "),
-famHx:collect("fh_").join(", "),
-meds:meds.value,
-allergies:allergies.value
+headers:{
+  "Content-Type":"application/json"
+},
+body: JSON.stringify(payload)
 })
-});
+.then(res => res.text())
+.then(data => {
+  console.log("Saved:", data);
 
-document.getElementById("app").innerHTML=`
-<div class="result green">
-✅ Submitted<br><br>
-<button onclick="join()">Join Visit</button>
-</div>`;
+  document.getElementById("app").innerHTML=`
+  <div class="result green">
+  ✅ Submitted<br><br>
+  <button onclick="join()">Join Visit</button>
+  </div>`;
+})
+.catch(err=>{
+  console.error("Error:", err);
+  alert("Submission failed");
+});
 }
 
 function join(){
