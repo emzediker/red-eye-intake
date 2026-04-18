@@ -28,7 +28,7 @@
       }
 
       button {
-        margin-top: 15px;
+        margin-top: 20px;
         padding: 12px;
         font-size: 16px;
         width: 100%;
@@ -133,11 +133,9 @@
         const chemical = document.getElementById("chemical").checked;
         const contactLensPain = document.getElementById("contactLensPain").checked;
 
-        const redness = document.getElementById("redness").checked;
         const itching = document.getElementById("itching").checked;
-        const discharge = document.getElementById("discharge").checked;
         const lidBump = document.getElementById("lidBump").checked;
-        const irritation = document.getElementById("irritation").checked;
+        const discharge = document.getElementById("discharge").checked;
 
         const resultBox = document.getElementById("result");
 
@@ -152,7 +150,7 @@
           return;
         }
 
-        // NONE OF THE ABOVE
+        // NONE SELECTED
         if (none) {
           resultBox.className = "result red";
           resultBox.innerText =
@@ -160,32 +158,24 @@
           return;
         }
 
-        const hasSymptoms =
-          redness || itching || discharge || lidBump || irritation;
-
-        if (hasSymptoms) {
+        // CLINICAL LOGIC
+        if (lidBump) {
           resultBox.className = "result green";
-          resultBox.innerHTML = `
-            ✅ You are a candidate for virtual eye care.<br><br>
-
-            <button onclick="scheduleVisit()">Schedule a Visit</button>
-            <button onclick="joinNow()">Join Next Available</button>
-          `;
+          resultBox.innerText =
+            "✅ This may be a stye or eyelid inflammation. You are likely a good candidate for virtual care.";
+        } else if (itching && !pain && !light) {
+          resultBox.className = "result green";
+          resultBox.innerText =
+            "✅ Symptoms are consistent with allergic irritation. Virtual care may be appropriate.";
+        } else if (discharge && !pain) {
+          resultBox.className = "result green";
+          resultBox.innerText =
+            "✅ Possible conjunctivitis. You may be a candidate for virtual evaluation.";
         } else {
           resultBox.className = "result red";
           resultBox.innerText =
-            "⚠️ We recommend an in-person evaluation.";
+            "⚠️ Your symptoms are not clearly suitable for telehealth. In-person evaluation is recommended.";
         }
-      }
-
-      function scheduleVisit() {
-        alert("Scheduling page coming next");
-        // later:
-        // window.location.href = "YOUR_SCHEDULING_LINK";
-      }
-
-      function joinNow() {
-        window.location.href = "https://doxy.me/YOURROOM";
       }
     </script>
   </body>
