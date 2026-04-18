@@ -1,211 +1,237 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Red Eye Intake</title>
+<head>
+  <title>Texas Virtual Eye Care – Red Eye & Stye</title>
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 520px;
-        margin: 40px auto;
-        line-height: 1.6;
-      }
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 520px;
+      margin: 40px auto;
+    }
 
-      h1 {
-        text-align: center;
-      }
+    h1 {
+      text-align: center;
+    }
 
-      .step {
-        display: none;
-      }
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: gray;
+      margin-bottom: 20px;
+    }
 
-      .active {
-        display: block;
-      }
+    .step { display: none; }
+    .active { display: block; }
 
-      button {
-        margin-top: 15px;
-        padding: 12px;
-        font-size: 16px;
-        width: 100%;
-        cursor: pointer;
-      }
+    input, textarea, select {
+      width: 100%;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      padding: 8px;
+    }
 
-      .result {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        font-weight: bold;
-      }
+    button {
+      padding: 12px;
+      width: 100%;
+      margin-top: 10px;
+      cursor: pointer;
+    }
 
-      .red {
-        background-color: #ffe5e5;
-        color: #cc0000;
-      }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
 
-      .green {
-        background-color: #e6ffe6;
-        color: #006600;
-      }
+    .red { background:#ffe5e5; color:#cc0000; }
+    .green { background:#e6ffe6; color:#006600; }
 
-      .disclaimer {
-        font-size: 14px;
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 8px;
-      }
-    </style>
-  </head>
+    .disclaimer {
+      background:#f5f5f5;
+      padding:15px;
+      border-radius:8px;
+      font-size:14px;
+    }
+  </style>
+</head>
 
-  <body>
-    <h1>Eyecare Teledoc Intake</h1>
+<body>
 
-    <!-- STEP 1 -->
-    <div id="step1" class="step active">
-      <div class="disclaimer">
-        <strong>Important Information:</strong><br /><br />
-        This tool helps determine if you may be appropriate for virtual eye care.
-        It does not provide a diagnosis.<br /><br />
-        Pain, light sensitivity, or vision changes should be evaluated in person.
-      </div>
+<h1>Texas Virtual Eye Care – Red Eye & Stye</h1>
+<p class="subtitle">
+  Telehealth for non-emergency eye conditions in Texas only
+</p>
 
-      <button onclick="nextStep(2)">Start</button>
-    </div>
+<!-- STEP 1 -->
+<div id="step1" class="step active">
+  <div class="disclaimer">
+    This tool helps determine if you may be appropriate for virtual eye care.
+    It does not provide a diagnosis.<br><br>
+    Pain, light sensitivity, or vision changes should be evaluated in person.
+  </div>
+  <button onclick="nextStep(2)">Start</button>
+</div>
 
-    <!-- STEP 2 -->
-    <div id="step2" class="step">
-      <p><strong>Select your symptoms:</strong></p>
+<!-- STEP 2 -->
+<div id="step2" class="step">
+  <p><b>What symptoms are you experiencing?</b></p>
 
-      <label><input type="checkbox" id="redness" onclick="handleNone('symptoms')" /> Red eye</label><br />
-      <label><input type="checkbox" id="itching" onclick="handleNone('symptoms')" /> Itching</label><br />
-      <label><input type="checkbox" id="discharge" onclick="handleNone('symptoms')" /> Discharge</label><br />
-      <label><input type="checkbox" id="lidBump" onclick="handleNone('symptoms')" /> Eyelid bump / stye</label><br />
-      <label><input type="checkbox" id="irritation" onclick="handleNone('symptoms')" /> Irritation</label><br />
-      <label><input type="checkbox" id="noneSymptoms" onclick="handleNone('symptoms')" /> None of the above</label><br />
+  <label><input type="checkbox" id="redness" onclick="handleNone('symptoms')"> Red eye</label><br>
+  <label><input type="checkbox" id="itching" onclick="handleNone('symptoms')"> Itching</label><br>
+  <label><input type="checkbox" id="discharge" onclick="handleNone('symptoms')"> Discharge</label><br>
+  <label><input type="checkbox" id="lidBump" onclick="handleNone('symptoms')"> Stye / lid bump</label><br>
+  <label><input type="checkbox" id="irritation" onclick="handleNone('symptoms')"> Irritation</label><br>
+  <label><input type="checkbox" id="noneSymptoms" onclick="handleNone('symptoms')"> None of the above</label>
 
-      <button onclick="nextStep(3)">Next</button>
-    </div>
+  <button onclick="nextStep(3)">Next</button>
+</div>
 
-    <!-- STEP 3 -->
-    <div id="step3" class="step">
-      <p><strong>Do you have any of the following?</strong></p>
+<!-- STEP 3 -->
+<div id="step3" class="step">
+  <p><b>Do you have any of the following?</b></p>
 
-      <label><input type="checkbox" id="visionLoss" onclick="handleNone('redflags')" /> Decreased vision</label><br />
-      <label><input type="checkbox" id="pain" onclick="handleNone('redflags')" /> Moderate/severe pain</label><br />
-      <label><input type="checkbox" id="light" onclick="handleNone('redflags')" /> Light sensitivity</label><br />
-      <label><input type="checkbox" id="trauma" onclick="handleNone('redflags')" /> Trauma</label><br />
-      <label><input type="checkbox" id="chemical" onclick="handleNone('redflags')" /> Chemical exposure</label><br />
-      <label><input type="checkbox" id="contactLensPain" onclick="handleNone('redflags')" /> Contact lens pain</label><br />
-      <label><input type="checkbox" id="noneRedFlags" onclick="handleNone('redflags')" /> None of the above</label><br />
+  <label><input type="checkbox" id="visionLoss" onclick="handleNone('redflags')"> Vision loss</label><br>
+  <label><input type="checkbox" id="pain" onclick="handleNone('redflags')"> Severe pain</label><br>
+  <label><input type="checkbox" id="light" onclick="handleNone('redflags')"> Light sensitivity</label><br>
+  <label><input type="checkbox" id="trauma" onclick="handleNone('redflags')"> Trauma</label><br>
+  <label><input type="checkbox" id="chemical" onclick="handleNone('redflags')"> Chemical exposure</label><br>
+  <label><input type="checkbox" id="contactLensPain" onclick="handleNone('redflags')"> Contact lens pain</label><br>
+  <label><input type="checkbox" id="noneRedFlags" onclick="handleNone('redflags')"> None of the above</label>
 
-      <button onclick="runTriage()">Submit</button>
-    </div>
+  <button onclick="nextStep(4)">Next</button>
+</div>
 
-    <div id="result"></div>
+<!-- STEP 4 -->
+<div id="step4" class="step">
+  <p><b>Patient Information</b></p>
 
-    <script>
-      function nextStep(step) {
-        document.querySelectorAll(".step").forEach((el) => el.classList.remove("active"));
-        document.getElementById("step" + step).classList.add("active");
-      }
+  <label>Chief Complaint</label>
+  <textarea id="cc" placeholder="Describe your symptoms..."></textarea>
 
-      function handleNone(group) {
-        if (group === "symptoms") {
-          const none = document.getElementById("noneSymptoms");
+  <label>When did this start?</label>
+  <select id="duration">
+    <option>Today</option>
+    <option>1-2 days</option>
+    <option>3-5 days</option>
+    <option>1 week+</option>
+  </select>
 
-          const boxes = ["redness","itching","discharge","lidBump","irritation"];
+  <label>Contact lens wearer?</label>
+  <select id="contacts">
+    <option>No</option>
+    <option>Yes</option>
+  </select>
 
-          if (none.checked) {
-            boxes.forEach(id => document.getElementById(id).checked = false);
-          } else {
-            boxes.forEach(id => {
-              if (document.getElementById(id).checked) {
-                none.checked = false;
-              }
-            });
-          }
+  <label>Medication allergies</label>
+  <input type="text" id="allergies">
+
+  <label>Medical history</label>
+  <input type="text" id="medHx">
+
+  <button onclick="runTriage()">Submit</button>
+</div>
+
+<!-- RESULT -->
+<div id="result"></div>
+
+<script>
+function nextStep(step){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.getElementById("step"+step).classList.add("active");
+}
+
+function handleNone(group){
+
+  if(group==="symptoms"){
+    const none=document.getElementById("noneSymptoms");
+    const boxes=["redness","itching","discharge","lidBump","irritation"];
+
+    if(none.checked){
+      boxes.forEach(id=>document.getElementById(id).checked=false);
+    } else {
+      boxes.forEach(id=>{
+        if(document.getElementById(id).checked){
+          none.checked=false;
         }
+      });
+    }
+  }
 
-        if (group === "redflags") {
-          const none = document.getElementById("noneRedFlags");
+  if(group==="redflags"){
+    const none=document.getElementById("noneRedFlags");
+    const boxes=["visionLoss","pain","light","trauma","chemical","contactLensPain"];
 
-          const boxes = ["visionLoss","pain","light","trauma","chemical","contactLensPain"];
-
-          if (none.checked) {
-            boxes.forEach(id => document.getElementById(id).checked = false);
-          } else {
-            boxes.forEach(id => {
-              if (document.getElementById(id).checked) {
-                none.checked = false;
-              }
-            });
-          }
+    if(none.checked){
+      boxes.forEach(id=>document.getElementById(id).checked=false);
+    } else {
+      boxes.forEach(id=>{
+        if(document.getElementById(id).checked){
+          none.checked=false;
         }
-      }
+      });
+    }
+  }
+}
 
-      function runTriage() {
-        const noneSymptoms = document.getElementById("noneSymptoms").checked;
-        const noneRedFlags = document.getElementById("noneRedFlags").checked;
+function runTriage(){
 
-        const visionLoss = document.getElementById("visionLoss").checked;
-        const pain = document.getElementById("pain").checked;
-        const light = document.getElementById("light").checked;
-        const trauma = document.getElementById("trauma").checked;
-        const chemical = document.getElementById("chemical").checked;
-        const contactLensPain = document.getElementById("contactLensPain").checked;
+  const noneSymptoms=document.getElementById("noneSymptoms").checked;
 
-        const redness = document.getElementById("redness").checked;
-        const itching = document.getElementById("itching").checked;
-        const discharge = document.getElementById("discharge").checked;
-        const lidBump = document.getElementById("lidBump").checked;
-        const irritation = document.getElementById("irritation").checked;
+  const visionLoss=document.getElementById("visionLoss").checked;
+  const pain=document.getElementById("pain").checked;
+  const light=document.getElementById("light").checked;
+  const trauma=document.getElementById("trauma").checked;
+  const chemical=document.getElementById("chemical").checked;
+  const contactLensPain=document.getElementById("contactLensPain").checked;
 
-        const resultBox = document.getElementById("result");
+  const redness=document.getElementById("redness").checked;
+  const itching=document.getElementById("itching").checked;
+  const discharge=document.getElementById("discharge").checked;
+  const lidBump=document.getElementById("lidBump").checked;
+  const irritation=document.getElementById("irritation").checked;
 
-        // RED FLAG CHECK
-        const highRisk =
-          visionLoss || pain || light || trauma || chemical || contactLensPain;
+  const resultBox=document.getElementById("result");
 
-        if (highRisk) {
-          resultBox.className = "result red";
-          resultBox.innerText =
-            "🚫 Please seek in-person eye care as soon as possible.";
-          return;
-        }
+  const highRisk=visionLoss||pain||light||trauma||chemical||contactLensPain;
 
-        // VALIDATION
-        if (noneSymptoms && !noneRedFlags) {
-          resultBox.className = "result red";
-          resultBox.innerText =
-            "⚠️ Please select at least one symptom.";
-          return;
-        }
+  if(highRisk){
+    resultBox.className="result red";
+    resultBox.innerText="🚫 Please seek in-person eye care immediately.";
+    return;
+  }
 
-        const hasSymptoms =
-          redness || itching || discharge || lidBump || irritation;
+  if(noneSymptoms){
+    resultBox.className="result red";
+    resultBox.innerText="⚠️ Please select at least one symptom.";
+    return;
+  }
 
-        if (hasSymptoms || (noneSymptoms && noneRedFlags)) {
-          resultBox.className = "result green";
-          resultBox.innerHTML = `
-            ✅ You are a candidate for virtual eye care.<br><br>
+  const hasSymptoms=redness||itching||discharge||lidBump||irritation;
 
-            <button onclick="scheduleVisit()">Schedule a Visit</button>
-            <button onclick="joinNow()">Join Next Available</button>
-          `;
-        } else {
-          resultBox.className = "result red";
-          resultBox.innerText =
-            "⚠️ We recommend an in-person evaluation.";
-        }
-      }
+  if(hasSymptoms){
+    resultBox.className="result green";
+    resultBox.innerHTML=`
+      ✅ You are a candidate for virtual eye care.<br><br>
 
-      function scheduleVisit() {
-        alert("Scheduling page coming next");
-      }
+      <button onclick="scheduleVisit()">Schedule Visit</button>
+      <button onclick="joinNow()">Join Next Available</button>
+    `;
+  } else {
+    resultBox.className="result red";
+    resultBox.innerText="⚠️ In-person evaluation recommended.";
+  }
+}
 
-      function joinNow() {
-        window.location.href = "https://doxy.me/YOURROOM";
-      }
-    </script>
-  </body>
+function scheduleVisit(){
+  alert("Scheduling page coming next");
+}
+
+function joinNow(){
+  window.location.href="https://doxy.me/YOURROOM";
+}
+</script>
+
+</body>
 </html>
