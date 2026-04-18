@@ -100,9 +100,11 @@ ${cb("noneRF","None of the above")}
 
 <p><b>Medical History</b></p>
 ${medHx("mh_")}
+<input id="mh_other" placeholder="Other medical history">
 
 <p><b>Family History</b></p>
 ${medHx("fh_")}
+<input id="fh_other" placeholder="Other family history">
 
 <textarea id="meds" placeholder="Medications"></textarea>
 <input id="allergies" placeholder="Allergies">
@@ -158,7 +160,7 @@ document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
 }
 
-// ================= SAVE MULTIPLE PATIENTS =================
+// ================= SAVE =================
 
 function submitForm(){
 
@@ -183,7 +185,9 @@ phone:patient.phone,
 cc:cc.value,
 symptoms:symptoms,
 medHx:collect("mh_"),
+medHxOther:mh_other.value,
 famHx:collect("fh_"),
+famHxOther:fh_other.value,
 meds:meds.value,
 allergies:allergies.value,
 time:new Date().toLocaleString()
@@ -240,8 +244,11 @@ document.getElementById("app").innerHTML=`
 
 <b>Symptoms:</b><br>${p.symptoms.join(", ")}<br><br>
 
-<b>Medical History:</b><br>${p.medHx.join(", ")}<br><br>
-<b>Family History:</b><br>${p.famHx.join(", ")}<br><br>
+<b>Medical History:</b><br>${p.medHx.join(", ")}<br>
+<b>Other:</b> ${p.medHxOther || "None"}<br><br>
+
+<b>Family History:</b><br>${p.famHx.join(", ")}<br>
+<b>Other:</b> ${p.famHxOther || "None"}<br><br>
 
 <b>Medications:</b><br>${p.meds}<br><br>
 <b>Allergies:</b><br>${p.allergies}<br><br>
