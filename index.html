@@ -141,12 +141,20 @@ ${cb(prefix+"none","None")}
 }
 
 function validate(){
-if(!name.value || !phone.value){ alert("Enter info"); return; }
-patient.name = name.value;
-patient.phone = phone.value;
-next(2);
+
+const nameInput = document.getElementById("name").value;
+const phoneInput = document.getElementById("phone").value;
+
+if(!nameInput || !phoneInput){
+  alert("Enter info");
+  return;
 }
 
+patient.name = nameInput;
+patient.phone = phoneInput;
+
+next(2);
+}
 function next(step){
 if(step===4){
 if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
