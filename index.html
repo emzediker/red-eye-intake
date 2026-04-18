@@ -63,9 +63,6 @@ let patient={};
 
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
-// ================= PATIENT (UNCHANGED) =================
-// (keeping your exact patient UI logic as-is)
-
 // ================= PROVIDER =================
 
 function loadProvider(){
@@ -107,15 +104,20 @@ function openChart(i){
 currentIndex = i;
 let p = sheetPatients[i];
 
-let name = p.Name || p.name || "";
-let phone = p.Phone || p.phone || "";
-let time = p.Time || p.time || "";
-let cc = p.CC || p.cc || "";
-let symptoms = p.Symptoms || p.symptoms || "";
-let medHx = p.MedHx || p.medHx || "";
-let famHx = p.FamHx || p.famHx || "";
-let meds = p.Meds || p.meds || "";
-let allergies = p.Allergies || p.allergies || "";
+let name = p.Name || "";
+let phone = p.Phone || "";
+let time = p.Time || "";
+let cc = p.CC || "";
+let symptoms = p.Symptoms || "";
+let medHx = p.MedHx || "";
+let famHx = p.FamHx || "";
+let meds = p.Meds || "";
+let allergies = p.Allergies || "";
+
+// 🔥 PDF NAME FIX
+let cleanName = name.replace(/\s+/g, "_");
+let date = new Date().toISOString().split("T")[0];
+document.title = cleanName + "_" + date;
 
 document.getElementById("app").innerHTML=`
 
@@ -139,7 +141,7 @@ document.getElementById("app").innerHTML=`
 
 <div class="soap-section">
 <div class="soap-title">O: Objective</div>
-<textarea placeholder="Lids/Lashes, Conj, Cornea, AC, Pupils, EOMs"></textarea>
+<textarea placeholder="Lids/Lashes, Conjunctiva, Cornea, AC, Pupils, EOMs"></textarea>
 </div>
 
 <div class="soap-section">
@@ -160,15 +162,15 @@ document.getElementById("app").innerHTML=`
 </select>
 
 <input id="customICD" placeholder="Enter ICD-10" style="display:none;">
+<textarea id="assessmentBox"></textarea>
 
-<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
 </div>
 
 <div class="soap-section">
 <div class="soap-title">P: Plan</div>
-<textarea placeholder="Treatment plan"></textarea><br>
+<textarea></textarea><br>
 <b>Follow-Up:</b><br>
-<textarea placeholder="Follow-up instructions"></textarea>
+<textarea></textarea>
 </div>
 
 <div class="signature">
@@ -182,7 +184,8 @@ _________________________<br>
 </div>
 
 <button onclick="window.print()">Print / Save PDF</button>
-<button onclick="loadProvider()">Back</button>
+<button onclick="removePatient()">Remove Patient</button>
+<button onclick="loadProvider()">Back to Queue</button>
 
 </div>
 `;
@@ -190,7 +193,7 @@ _________________________<br>
 updateDoctor();
 }
 
-// ICD auto-fill
+// ICD autofill
 document.addEventListener("change", function(e){
 
 if(e.target.id==="icdSelect"){
@@ -210,6 +213,15 @@ if(box) box.value=e.target.value;
 function updateDoctor(){
 let d=document.getElementById("doctorSelect").value;
 document.getElementById("npi").innerText="NPI: "+providers[d].npi;
+}
+
+// 🔥 REMOVE PATIENT
+function removePatient(){
+
+if(!confirm("Remove this patient from queue?")) return;
+
+sheetPatients.splice(currentIndex,1);
+loadProvider();
 }
 
 function join(){
