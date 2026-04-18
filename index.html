@@ -74,12 +74,14 @@ ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
 ${cb("lid","Stye / lid bump")}
+${cb("irritation","Irritation")}
+${cb("noneSymptoms","None of the above")}
 
 <button onclick="next(3)">Next</button>
 </div>
 
 <div class="step" id="step3">
-<p><b>Red Flags</b></p>
+<p><b>Do you have any of the following symptoms?</b></p>
 
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
@@ -165,6 +167,7 @@ if(redness.checked) symptoms.push("Red eye");
 if(itching.checked) symptoms.push("Itching");
 if(discharge.checked) symptoms.push("Discharge");
 if(lid.checked) symptoms.push("Stye");
+if(irritation.checked) symptoms.push("Irritation");
 
 function collect(prefix){
 let arr=[];
