@@ -49,50 +49,53 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ2Cfxdgibixbq9TyxfLbEIlW2q3hBP_tIBrpdp9wM6vnXocOr5FX5SpKcnr9XVmgN/exec";
-
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
   "Sophia Brown, OD": { npi: "1750279949" }
 };
 
 let doctorName = "Emily Zediker, OD";
-let sheetPatients = [];
 let currentIndex = null;
-let patient = {};
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
+let patient={};
 
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
-//////////////////// PATIENT ////////////////////
+// ================= PATIENT =================
 
 function loadPatient(){
 document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step1">
+
 <div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
+This tool helps determine if your condition is appropriate for telehealth.
 If you have pain, light sensitivity, or vision loss, you should be seen in person.
 </div>
 
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
+
 <button onclick="validate()">Next</button>
 </div>
 
 <div class="step" id="step2">
-<b>Symptoms</b>
+<p><b>Symptoms</b></p>
+
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
 ${cb("lid","Stye / lid bump")}
 ${cb("irritation","Irritation")}
 ${cb("noneSymptoms","None of the above")}
+
 <button onclick="next(3)">Next</button>
 </div>
 
 <div class="step" id="step3">
-<b>Serious Symptoms</b>
+<p><b>Do you have any of the following symptoms?</b></p>
+
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
 ${cb("light","Light sensitivity")}
@@ -100,17 +103,19 @@ ${cb("trauma","Trauma")}
 ${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
 ${cb("noneRF","None of the above")}
+
 <button onclick="next(4)">Next</button>
 </div>
 
 <div class="step" id="step4">
+
 <textarea id="cc" placeholder="Chief Complaint"></textarea>
 
-<b>Medical History</b>
+<p><b>Medical History</b></p>
 ${medHx("mh_")}
 <input id="mh_other" placeholder="Other medical history">
 
-<b>Family History</b>
+<p><b>Family History</b></p>
 ${medHx("fh_")}
 <input id="fh_other" placeholder="Other family history">
 
@@ -119,6 +124,8 @@ ${medHx("fh_")}
 
 <button onclick="submitForm()">Submit</button>
 </div>
+
+<div id="result"></div>
 `;
 }
 
@@ -140,32 +147,42 @@ ${cb(prefix+"none","None")}
 `;
 }
 
+// ================= FLOW =================
+
 function validate(){
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
 
-const nameInput = document.getElementById("name").value;
-const phoneInput = document.getElementById("phone").value;
+if(!name||!phone){alert("Enter info");return;}
 
-if(!nameInput || !phoneInput){
-  alert("Enter info");
-  return;
-}
-
-patient.name = nameInput;
-patient.phone = phoneInput;
+patient.name=name;
+patient.phone=phone;
 
 next(2);
 }
+
 function next(step){
+
 if(step===4){
 if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
-document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care required</div>";
+document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
 return;
 }}
+
 document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
 }
 
+// ================= SAVE =================
+
 function submitForm(){
+
+let symptoms=[];
+if(redness.checked) symptoms.push("Red eye");
+if(itching.checked) symptoms.push("Itching");
+if(discharge.checked) symptoms.push("Discharge");
+if(lid.checked) symptoms.push("Stye");
+if(irritation.checked) symptoms.push("Irritation");
 
 function collect(prefix){
 let arr=[];
@@ -175,152 +192,184 @@ if(document.getElementById(prefix+x).checked){arr.push(x);}
 return arr;
 }
 
-const payload = {
-name: patient.name,
-phone: patient.phone,
-cc: document.getElementById("cc").value,
-symptoms: "",
-medHx: collect("mh_").join(", "),
-famHx: collect("fh_").join(", "),
-meds: document.getElementById("meds").value,
-allergies: document.getElementById("allergies").value
+const newPatient={
+name:patient.name,
+phone:patient.phone,
+cc:cc.value,
+symptoms:symptoms,
+medHx:collect("mh_"),
+medHxOther:mh_other.value,
+famHx:collect("fh_"),
+famHxOther:fh_other.value,
+meds:meds.value,
+allergies:allergies.value,
+time:new Date().toLocaleString()
 };
 
-fetch(SCRIPT_URL,{
-method:"POST",
-headers:{
-  "Content-Type":"application/json"
-},
-body: JSON.stringify(payload)
-})
-.then(res => res.text())
-.then(data => {
-  console.log("Saved:", data);
+let all = JSON.parse(localStorage.getItem("patients")) || [];
+all.push(newPatient);
 
-  document.getElementById("app").innerHTML=`
-  <div class="result green">
-  ✅ Submitted<br><br>
-  <button onclick="join()">Join Visit</button>
-  </div>`;
-})
-.catch(err=>{
-  console.error("Error:", err);
-  alert("Submission failed");
-});
+localStorage.setItem("patients", JSON.stringify(all));
+
+document.getElementById("app").innerHTML=`
+<div class="result green">
+✅ You may proceed<br><br>
+<button onclick="join()">Join Visit</button>
+</div>`;
 }
 
-function join(){
-window.location.href="https://doxy.me/YOURROOM";
-}
-
-//////////////////// PROVIDER ////////////////////
+// ================= PROVIDER =================
 
 function loadProvider(){
 
-fetch(SCRIPT_URL)
-.then(res=>res.json())
-.then(patients=>{
+let patients = JSON.parse(localStorage.getItem("patients")) || [];
 
-if(!patients || patients.length===0){
+if(patients.length===0){
 document.getElementById("app").innerHTML="No patients yet";
 return;
 }
 
-sheetPatients = patients;
-
 let html="<h2>Patient Queue</h2>";
 
 patients.forEach((p,i)=>{
-let name = p.name || p.Name || "";
-let phone = p.phone || p.Phone || "";
-let time = p.time || p.Time || "";
-
 html+=`
 <div class="card" onclick="openChart(${i})">
-<b>${name}</b><br>
-${phone}<br>
-${time}
+<b>${p.name}</b><br>
+${p.phone}<br>
+${p.time}
 </div>`;
 });
 
 document.getElementById("app").innerHTML=html;
-
-});
 }
 
 function openChart(i){
 
 currentIndex = i;
-let p = sheetPatients[i];
 
-let name = p.name || p.Name || "";
-let phone = p.phone || p.Phone || "";
-let time = p.time || p.Time || "";
-let cc = p.cc || p.CC || "";
-let medHx = p.medHx || p.MedHx || "";
-let famHx = p.famHx || p.FamHx || "";
-let meds = p.meds || p.Meds || "";
-let allergies = p.allergies || p.Allergies || "";
+let p = JSON.parse(localStorage.getItem("patients"))[i];
 
-document.title = name.replace(/\s+/g,"_");
+let cleanName = p.name.replace(/\s+/g, "_");
+let date = new Date().toISOString().split("T")[0];
+document.title = cleanName + "_" + date;
+
+let doctorSelector = `
+<label><b>Select Provider:</b></label>
+<select id="doctorSelect" onchange="updateDoctor()">
+  <option value="Emily Zediker, OD">Emily Zediker, OD</option>
+  <option value="Sophia Brown, OD">Sophia Brown, OD</option>
+</select><br><br>
+`;
 
 document.getElementById("app").innerHTML=`
+
+${doctorSelector}
 
 <div class="print-container">
 
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${name}<br>
-<b>Phone:</b> ${phone}<br>
-<b>Date:</b> ${time}<br><br>
+<b>Name:</b> ${p.name}<br>
+<b>Phone:</b> ${p.phone}<br>
+<b>Date:</b> ${p.time}<br><br>
 
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
-${cc}
+<b>Chief Complaint:</b> ${p.cc}<br>
+<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
+<b>Medical History:</b> ${p.medHx.join(", ")}<br>
+<b>Other:</b> ${p.medHxOther || "None"}<br>
+<b>Family History:</b> ${p.famHx.join(", ")}<br>
+<b>Other:</b> ${p.famHxOther || "None"}<br>
+<b>Medications:</b> ${p.meds}<br>
+<b>Allergies:</b> ${p.allergies}
 </div>
 
 <div class="soap-section">
 <div class="soap-title">O: Objective</div>
-<textarea></textarea>
+Telehealth evaluation
 </div>
 
 <div class="soap-section">
 <div class="soap-title">A: Assessment</div>
 
 <select id="icdSelect">
-<option>H10.3 Acute conjunctivitis</option>
-<option>H10.45 Chronic allergic conjunctivitis</option>
-<option>H00.19 Chalazion</option>
-<option>H57.1 Ocular pain</option>
+  <option value="">-- Select ICD-10 --</option>
+  <option>H10.3 – Acute conjunctivitis</option>
+  <option>H10.45 – Chronic allergic conjunctivitis</option>
+  <option>H01.00 – Blepharitis</option>
+  <option>H00.019 – Hordeolum externum</option>
+  <option>H00.029 – Hordeolum internum</option>
+  <option>H00.19 – Chalazion</option>
+  <option>H04.12 – Dry eye</option>
+  <option>H11.3 – Subconjunctival hemorrhage</option>
+  <option>H57.1 – Ocular pain</option>
+  <option value="other">Other</option>
 </select>
 
-<textarea id="assessmentBox"></textarea>
+<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
 
+<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
 </div>
 
 <div class="soap-section">
 <div class="soap-title">P: Plan</div>
+<textarea></textarea><br>
+<b>Follow-Up:</b><br>
 <textarea></textarea>
 </div>
 
 <div class="signature">
+<br><br>
 _________________________<br>
 ${doctorName}<br>
 NPI: ${providers[doctorName].npi}
 </div>
 
-<button onclick="window.print()">Print</button>
-<button onclick="removePatient()">Remove</button>
-<button onclick="loadProvider()">Back</button>
+<button onclick="window.print()">Print / Save PDF</button>
+<button onclick="removePatient(${i})">Remove Patient</button>
 
 </div>
 `;
 }
 
-function removePatient(){
-if(!confirm("Remove patient?")) return;
-sheetPatients.splice(currentIndex,1);
-loadProvider();
+// ICD auto-fill
+document.addEventListener("change", function(e){
+
+  if(e.target && e.target.id === "icdSelect"){
+
+    const custom = document.getElementById("customICD");
+    const box = document.getElementById("assessmentBox");
+
+    if(e.target.value === "other"){
+      custom.style.display = "block";
+      return;
+    } else {
+      custom.style.display = "none";
+    }
+
+    if(e.target.value && box){
+      box.value = e.target.value;
+    }
+  }
+
+});
+
+function updateDoctor(){
+  doctorName = document.getElementById("doctorSelect").value;
+  openChart(currentIndex);
+}
+
+function removePatient(index){
+  if(!confirm("Are you sure you want to remove this patient?")) return;
+  let patients = JSON.parse(localStorage.getItem("patients")) || [];
+  patients.splice(index, 1);
+  localStorage.setItem("patients", JSON.stringify(patients));
+  loadProvider();
+}
+
+function join(){
+window.location.href="https://doxy.me/YOURROOM";
 }
 
 </script>
