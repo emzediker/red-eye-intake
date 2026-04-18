@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Texas Virtual Eye Care</title>
+<title>Texas Virtual Eye Care – Red Eye & Stye</title>
 
 <style>
 body { font-family: Arial; max-width: 520px; margin: 40px auto; }
+h1 { text-align:center; }
+.subtitle { text-align:center; color:gray; margin-bottom:20px; }
+
 .step { display:none; }
 .active { display:block; }
 
@@ -15,18 +18,27 @@ body { font-family: Arial; max-width: 520px; margin: 40px auto; }
   margin-bottom:6px;
 }
 
-textarea,input,select { width:100%; margin-bottom:12px; padding:8px; }
-
+textarea,input { width:100%; margin-bottom:12px; padding:8px; }
 button { width:100%; padding:12px; margin-top:10px; }
 
 .result { padding:15px; border-radius:8px; }
 .green { background:#e6ffe6; }
 .red { background:#ffe5e5; }
-</style>
 
+.card {
+  border:1px solid #ccc;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+</style>
 </head>
 
 <body>
+
+<h1>Texas Virtual Eye Care</h1>
+<p class="subtitle">Telehealth for red eye & lid conditions (Texas only)</p>
 
 <div id="app"></div>
 
@@ -42,36 +54,47 @@ if(isProvider){ loadProvider(); } else { loadPatient(); }
 function loadPatient(){
 document.getElementById("app").innerHTML=`
 
-<div id="step1" class="step active">
-<input id="name" placeholder="Name">
-<input id="phone" placeholder="Phone">
+<div class="step active" id="step1">
+
+<div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
+This tool helps determine if your condition is appropriate for telehealth.
+If you have pain, light sensitivity, or vision loss, you should be seen in person.
+</div>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone Number">
+
 <button onclick="validate()">Next</button>
 </div>
 
-<div id="step2" class="step">
-<p>Symptoms</p>
+<div class="step" id="step2">
+<p><b>Symptoms</b></p>
+
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
-${cb("lid","Stye")}
+${cb("lid","Stye / lid bump")}
+
 <button onclick="next(3)">Next</button>
 </div>
 
-<div id="step3" class="step">
-<p>Red Flags</p>
+<div class="step" id="step3">
+<p><b>Red Flags</b></p>
+
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
 ${cb("light","Light sensitivity")}
 ${cb("trauma","Trauma")}
-${cb("chemical","Chemical")}
+${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
 ${cb("noneRF","None of the above")}
+
 <button onclick="next(4)">Next</button>
 </div>
 
-<div id="step4" class="step">
+<div class="step" id="step4">
 
-<textarea id="cc" placeholder="Chief complaint"></textarea>
+<textarea id="cc" placeholder="Chief Complaint"></textarea>
 
 <p><b>Medical History</b></p>
 ${medHx("mh_")}
@@ -86,7 +109,6 @@ ${medHx("fh_")}
 </div>
 
 <div id="result"></div>
-
 `;
 }
 
@@ -118,6 +140,7 @@ if(!name||!phone){alert("Enter info");return;}
 
 patient.name=name;
 patient.phone=phone;
+
 next(2);
 }
 
@@ -125,7 +148,7 @@ function next(step){
 
 if(step===4){
 if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
-document.getElementById("app").innerHTML="<div class='result red'>In person care needed</div>";
+document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
 return;
 }}
 
@@ -133,7 +156,7 @@ document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
 }
 
-// ================= SUBMIT =================
+// ================= SAVE MULTIPLE PATIENTS =================
 
 function submitForm(){
 
@@ -151,7 +174,7 @@ if(document.getElementById(prefix+x).checked){arr.push(x);}
 return arr;
 }
 
-const data={
+const newPatient={
 name:patient.name,
 phone:patient.phone,
 cc:cc.value,
@@ -159,14 +182,18 @@ symptoms:symptoms,
 medHx:collect("mh_"),
 famHx:collect("fh_"),
 meds:meds.value,
-allergies:allergies.value
+allergies:allergies.value,
+time:new Date().toLocaleString()
 };
 
-localStorage.setItem("pt",JSON.stringify(data));
+let all = JSON.parse(localStorage.getItem("patients")) || [];
+all.push(newPatient);
+
+localStorage.setItem("patients", JSON.stringify(all));
 
 document.getElementById("app").innerHTML=`
 <div class="result green">
-You may proceed<br><br>
+✅ You may proceed<br><br>
 <button onclick="join()">Join Visit</button>
 </div>`;
 }
@@ -175,42 +202,46 @@ You may proceed<br><br>
 
 function loadProvider(){
 
-const data=JSON.parse(localStorage.getItem("pt"));
+let patients = JSON.parse(localStorage.getItem("patients")) || [];
 
-if(!data){
-document.getElementById("app").innerHTML="No patient yet";
+if(patients.length===0){
+document.getElementById("app").innerHTML="No patients yet";
 return;
 }
 
-document.getElementById("app").innerHTML=`
-<h2>Provider Dashboard</h2>
+let html="<h2>Patient Queue</h2>";
 
-<b>${data.name}</b><br>${data.phone}<br><br>
+patients.forEach((p,i)=>{
+html+=`
+<div class="card" onclick="openChart(${i})">
+<b>${p.name}</b><br>
+${p.phone}<br>
+${p.time}
+</div>`;
+});
 
-<button onclick="chart()">Generate Chart</button>
-`;
+document.getElementById("app").innerHTML=html;
 }
 
-function chart(){
+function openChart(i){
 
-const d=JSON.parse(localStorage.getItem("pt"));
+let p = JSON.parse(localStorage.getItem("patients"))[i];
 
 document.getElementById("app").innerHTML=`
-
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${d.name}<br>
-<b>Phone:</b> ${d.phone}<br><br>
+<b>Name:</b> ${p.name}<br>
+<b>Phone:</b> ${p.phone}<br><br>
 
-<b>CC:</b><br>${d.cc}<br><br>
+<b>Chief Complaint:</b><br>${p.cc}<br><br>
 
-<b>Symptoms:</b><br>${d.symptoms.join(", ")}<br><br>
+<b>Symptoms:</b><br>${p.symptoms.join(", ")}<br><br>
 
-<b>Medical History:</b><br>${d.medHx.join(", ")}<br><br>
-<b>Family History:</b><br>${d.famHx.join(", ")}<br><br>
+<b>Medical History:</b><br>${p.medHx.join(", ")}<br><br>
+<b>Family History:</b><br>${p.famHx.join(", ")}<br><br>
 
-<b>Medications:</b><br>${d.meds}<br><br>
-<b>Allergies:</b><br>${d.allergies}<br><br>
+<b>Medications:</b><br>${p.meds}<br><br>
+<b>Allergies:</b><br>${p.allergies}<br><br>
 
 <b>Assessment:</b><br><textarea></textarea><br>
 <b>Plan:</b><br><textarea></textarea><br>
