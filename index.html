@@ -22,7 +22,6 @@
     .step { display: none; }
     .active { display: block; }
 
-    /* ✅ STABLE CHECKBOX GRID (DO NOT TOUCH) */
     .check-row {
       display: grid;
       grid-template-columns: 20px auto;
@@ -73,7 +72,7 @@
 <h1>Texas Virtual Eye Care – Red Eye & Stye</h1>
 <p class="subtitle">Telehealth for non-emergency eye conditions in Texas only</p>
 
-<!-- STEP 1: CONTACT -->
+<!-- STEP 1 -->
 <div id="step1" class="step active">
   <p><b>Patient Information</b></p>
 
@@ -89,7 +88,7 @@
   <button onclick="validateContact()">Next</button>
 </div>
 
-<!-- STEP 2: DISCLAIMER -->
+<!-- STEP 2 -->
 <div id="step2" class="step">
   <div class="disclaimer">
     This tool helps determine if you may be appropriate for virtual care.
@@ -98,7 +97,7 @@
   <button onclick="nextStep(3)">Continue</button>
 </div>
 
-<!-- STEP 3: SYMPTOMS -->
+<!-- STEP 3 -->
 <div id="step3" class="step">
   <p><b>What symptoms are you experiencing?</b></p>
 
@@ -112,7 +111,7 @@
   <button onclick="nextStep(4)">Next</button>
 </div>
 
-<!-- STEP 4: RED FLAGS -->
+<!-- STEP 4 -->
 <div id="step4" class="step">
   <p><b>Do you have any of the following?</b></p>
 
@@ -127,7 +126,7 @@
   <button onclick="nextStep(5)">Next</button>
 </div>
 
-<!-- STEP 5: FULL HISTORY -->
+<!-- STEP 5 -->
 <div id="step5" class="step">
   <p><b>Clinical Information</b></p>
 
@@ -148,37 +147,6 @@
     <option>Yes</option>
   </select>
 
-  <p><b>Medical History</b></p>
-
-  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
-  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
-  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
-  <div class="check-row"><input type="checkbox"><span>Depression</span></div>
-  <div class="check-row"><input type="checkbox"><span>None</span></div>
-
-  <input type="text" placeholder="Other medical history">
-
-  <label>Current Medications</label>
-  <textarea></textarea>
-
-  <label>Medication Allergies</label>
-  <input type="text">
-
-  <!-- ✅ FAMILY HISTORY CHECKLIST -->
-  <label><b>Family Medical History</b></label>
-
-  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
-  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
-  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
-  <div class="check-row"><input type="checkbox"><span>Eye disease (glaucoma, macular degeneration)</span></div>
-  <div class="check-row"><input type="checkbox"><span>None</span></div>
-
-  <input type="text" placeholder="Other family history">
-
   <button onclick="submitForm()">Submit</button>
 </div>
 
@@ -192,6 +160,7 @@ let patient = {};
 function validateContact(){
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
 
   if(!name || !phone){
     alert("Please enter your name and phone.");
@@ -200,6 +169,7 @@ function validateContact(){
 
   patient.name = name;
   patient.phone = phone;
+  patient.email = email;
 
   nextStep(2);
 }
@@ -227,13 +197,67 @@ function nextStep(step){
 }
 
 function submitForm(){
+
+  const cc = document.getElementById("cc").value;
+  const duration = document.getElementById("duration").value;
+  const contacts = document.getElementById("contacts").value;
+
+  let symptoms = [];
+  if(redness.checked) symptoms.push("Red eye");
+  if(itching.checked) symptoms.push("Itching");
+  if(discharge.checked) symptoms.push("Discharge");
+  if(lidBump.checked) symptoms.push("Stye/lid bump");
+  if(irritation.checked) symptoms.push("Irritation");
+
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
   result.innerHTML = `
     <div class="result green">
       ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
+
+      <h3>Medical Record</h3>
+
+      <div id="chart" style="text-align:left; background:#fff; padding:15px; border:1px solid #ccc">
+
+        <b>Name:</b> ${patient.name}<br>
+        <b>Phone:</b> ${patient.phone}<br>
+        <b>Date:</b> ${new Date().toLocaleDateString()}<br><br>
+
+        <b>Chief Complaint:</b><br>
+        ${cc}<br><br>
+
+        <b>Duration:</b> ${duration}<br>
+        <b>Contact Lens:</b> ${contacts}<br><br>
+
+        <b>Symptoms:</b><br>
+        ${symptoms.join(", ") || "None listed"}<br><br>
+
+        <b>Assessment:</b><br>
+        <textarea id="assessment"></textarea><br><br>
+
+        <b>Plan:</b><br>
+        <textarea id="plan"></textarea><br><br>
+
+        <b>Follow-Up:</b><br>
+        <textarea id="followup"></textarea><br><br>
+
+      </div>
+
+      <button onclick="printChart()">Print / Save PDF</button><br><br>
       <button onclick="joinNow()">Join Now</button>
-    </div>`;
+
+    </div>
+  `;
+}
+
+function printChart(){
+  const content = document.getElementById("chart").innerHTML;
+  const win = window.open('', '', 'width=800,height=600');
+  win.document.write('<html><head><title>Medical Record</title></head><body>');
+  win.document.write(content);
+  win.document.write('</body></html>');
+  win.document.close();
+  win.print();
 }
 
 function joinNow(){
