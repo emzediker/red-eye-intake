@@ -22,17 +22,19 @@
     .step { display: none; }
     .active { display: block; }
 
-    /* ✅ FIXED CHECKBOX SPACING */
+    /* ✅ FORCE INLINE ALIGNMENT (THIS FIXES YOUR ISSUE) */
     .checkbox-group label {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 0;
+      gap: 6px;
+      margin-bottom: 6px;
+      width: 100%;
       cursor: pointer;
     }
 
-    input[type="checkbox"] {
-      transform: scale(1.05);
+    .checkbox-group input[type="checkbox"] {
+      display: inline-block;
+      margin: 0;
     }
 
     input, textarea, select {
@@ -93,11 +95,11 @@
   <p><b>What symptoms are you experiencing?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="redness"> Red eye</label><br>
-    <label><input type="checkbox" id="itching"> Itching</label><br>
-    <label><input type="checkbox" id="discharge"> Discharge</label><br>
-    <label><input type="checkbox" id="lidBump"> Stye / lid bump</label><br>
-    <label><input type="checkbox" id="irritation"> Irritation</label><br>
+    <label><input type="checkbox" id="redness"> Red eye</label>
+    <label><input type="checkbox" id="itching"> Itching</label>
+    <label><input type="checkbox" id="discharge"> Discharge</label>
+    <label><input type="checkbox" id="lidBump"> Stye / lid bump</label>
+    <label><input type="checkbox" id="irritation"> Irritation</label>
     <label><input type="checkbox" id="noneSymptoms"> None of the above</label>
   </div>
 
@@ -109,12 +111,12 @@
   <p><b>Do you have any of the following?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="visionLoss"> Vision loss</label><br>
-    <label><input type="checkbox" id="pain"> Severe pain</label><br>
-    <label><input type="checkbox" id="light"> Light sensitivity</label><br>
-    <label><input type="checkbox" id="trauma"> Trauma</label><br>
-    <label><input type="checkbox" id="chemical"> Chemical exposure</label><br>
-    <label><input type="checkbox" id="contactLensPain"> Contact lens pain</label><br>
+    <label><input type="checkbox" id="visionLoss"> Vision loss</label>
+    <label><input type="checkbox" id="pain"> Severe pain</label>
+    <label><input type="checkbox" id="light"> Light sensitivity</label>
+    <label><input type="checkbox" id="trauma"> Trauma</label>
+    <label><input type="checkbox" id="chemical"> Chemical exposure</label>
+    <label><input type="checkbox" id="contactLensPain"> Contact lens pain</label>
     <label><input type="checkbox" id="noneRedFlags"> None of the above</label>
   </div>
 
@@ -126,10 +128,10 @@
   <p><b>Patient Information</b></p>
 
   <label>Chief Complaint</label>
-  <textarea id="cc" placeholder="Describe your symptoms"></textarea>
+  <textarea placeholder="Describe your symptoms"></textarea>
 
   <label>Duration</label>
-  <select id="duration">
+  <select>
     <option>Today</option>
     <option>1-2 days</option>
     <option>3-5 days</option>
@@ -137,19 +139,19 @@
   </select>
 
   <label>Contact lens wearer?</label>
-  <select id="contacts">
+  <select>
     <option>No</option>
     <option>Yes</option>
   </select>
 
   <p><b>Medical History</b></p>
   <div class="checkbox-group">
-    <label><input type="checkbox"> Diabetes</label><br>
-    <label><input type="checkbox"> Hypertension</label><br>
-    <label><input type="checkbox"> High cholesterol</label><br>
-    <label><input type="checkbox"> Cancer</label><br>
-    <label><input type="checkbox"> Autoimmune disease</label><br>
-    <label><input type="checkbox"> Depression</label><br>
+    <label><input type="checkbox"> Diabetes</label>
+    <label><input type="checkbox"> Hypertension</label>
+    <label><input type="checkbox"> High cholesterol</label>
+    <label><input type="checkbox"> Cancer</label>
+    <label><input type="checkbox"> Autoimmune disease</label>
+    <label><input type="checkbox"> Depression</label>
     <label><input type="checkbox"> None</label>
   </div>
 
@@ -159,10 +161,10 @@
   <textarea placeholder="List current medications"></textarea>
 
   <label>Medication Allergies</label>
-  <input type="text" placeholder="List medication allergies">
+  <input type="text">
 
   <label>Family Medical History</label>
-  <input type="text" placeholder="Optional">
+  <input type="text">
 
   <button onclick="submitForm()">Submit</button>
 </div>
@@ -171,10 +173,8 @@
 <div id="result"></div>
 
 <script>
-
 function nextStep(step){
 
-  // 🚫 EARLY STOP (red flags only)
   if(step === 4){
     const highRisk =
       document.getElementById("visionLoss").checked ||
@@ -188,7 +188,7 @@ function nextStep(step){
       document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
       document.getElementById("result").className="result red";
-      document.getElementById("result").innerHTML=
+      document.getElementById("result").innerHTML =
         "🚫 You should be evaluated in person based on your symptoms.";
 
       return;
@@ -203,16 +203,15 @@ function submitForm(){
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
   document.getElementById("result").className="result green";
-  document.getElementById("result").innerHTML=`
+  document.getElementById("result").innerHTML = `
     ✅ You are a candidate for virtual care.<br><br>
     <button onclick="joinNow()">Join Now</button>
   `;
 }
 
 function joinNow(){
-  window.location.href="https://doxy.me/YOURROOM";
+  window.location.href = "https://doxy.me/YOURROOM";
 }
-
 </script>
 
 </body>
