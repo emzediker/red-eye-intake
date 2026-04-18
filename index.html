@@ -49,7 +49,7 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-// ✅ PROVIDERS + NPI
+// PROVIDERS
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
   "Sophia Brown, OD": { npi: "1750279949" }
@@ -293,7 +293,23 @@ Telehealth evaluation
 
 <div class="soap-section">
 <div class="soap-title">A: Assessment</div>
-<textarea></textarea>
+
+<select id="icdSelect">
+  <option value="">-- Select ICD-10 --</option>
+  <option>H10.3 – Acute conjunctivitis</option>
+  <option>H01.00 – Blepharitis</option>
+  <option>H00.019 – Hordeolum externum</option>
+  <option>H00.029 – Hordeolum internum</option>
+  <option>H00.19 – Chalazion</option>
+  <option>H04.12 – Dry eye</option>
+  <option>H11.3 – Subconjunctival hemorrhage</option>
+  <option>H57.1 – Ocular pain</option>
+  <option value="other">Other</option>
+</select>
+
+<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
+
+<textarea placeholder="Assessment notes"></textarea>
 </div>
 
 <div class="soap-section">
@@ -317,7 +333,17 @@ NPI: ${providers[doctorName].npi}
 `;
 }
 
-// ✅ update provider + refresh chart
+document.addEventListener("change", function(e){
+  if(e.target && e.target.id === "icdSelect"){
+    const custom = document.getElementById("customICD");
+    if(e.target.value === "other"){
+      custom.style.display = "block";
+    } else {
+      custom.style.display = "none";
+    }
+  }
+});
+
 function updateDoctor(){
   doctorName = document.getElementById("doctorSelect").value;
   openChart(currentIndex);
