@@ -56,6 +56,7 @@ const providers = {
 
 let doctorName = "Emily Zediker, OD";
 let currentIndex = null;
+let sheetPatients = [];
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
@@ -211,7 +212,7 @@ let all = JSON.parse(localStorage.getItem("patients")) || [];
 all.push(newPatient);
 localStorage.setItem("patients", JSON.stringify(all));
 
-// ✅ SEND TO GOOGLE SHEETS
+// SEND TO GOOGLE SHEETS
 fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
   method: "POST",
   body: JSON.stringify({
@@ -237,149 +238,59 @@ document.getElementById("app").innerHTML=`
 
 function loadProvider(){
 
-let patients = JSON.parse(localStorage.getItem("patients")) || [];
+fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec")
+.then(res => res.json())
+.then(patients => {
 
 if(patients.length===0){
 document.getElementById("app").innerHTML="No patients yet";
 return;
 }
 
+sheetPatients = patients;
+
 let html="<h2>Patient Queue</h2>";
 
 patients.forEach((p,i)=>{
 html+=`
 <div class="card" onclick="openChart(${i})">
-<b>${p.name}</b><br>
-${p.phone}<br>
-${p.time}
+<b>${p.Name}</b><br>
+${p.Phone}<br>
+${p.Time}
 </div>`;
 });
 
 document.getElementById("app").innerHTML=html;
+
+});
 }
 
 function openChart(i){
 
 currentIndex = i;
-
-let p = JSON.parse(localStorage.getItem("patients"))[i];
-
-let cleanName = p.name.replace(/\s+/g, "_");
-let date = new Date().toISOString().split("T")[0];
-document.title = cleanName + "_" + date;
-
-let doctorSelector = `
-<label><b>Select Provider:</b></label>
-<select id="doctorSelect" onchange="updateDoctor()">
-  <option value="Emily Zediker, OD">Emily Zediker, OD</option>
-  <option value="Sophia Brown, OD">Sophia Brown, OD</option>
-</select><br><br>
-`;
+let p = sheetPatients[i];
 
 document.getElementById("app").innerHTML=`
 
-${doctorSelector}
-
-<div class="print-container">
-
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${p.name}<br>
-<b>Phone:</b> ${p.phone}<br>
-<b>Date:</b> ${p.time}<br><br>
+<b>Name:</b> ${p.Name}<br>
+<b>Phone:</b> ${p.Phone}<br>
+<b>Date:</b> ${p.Time}<br><br>
 
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
-<b>Chief Complaint:</b> ${p.cc}<br>
-<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
-<b>Medical History:</b> ${p.medHx.join(", ")}<br>
-<b>Other:</b> ${p.medHxOther || "None"}<br>
-<b>Family History:</b> ${p.famHx.join(", ")}<br>
-<b>Other:</b> ${p.famHxOther || "None"}<br>
-<b>Medications:</b> ${p.meds}<br>
-<b>Allergies:</b> ${p.allergies}
+<b>Chief Complaint:</b> ${p.CC}<br>
+<b>Symptoms:</b> ${p.Symptoms}<br>
+<b>Medical History:</b> ${p.MedHx}<br>
+<b>Family History:</b> ${p.FamHx}<br>
+<b>Medications:</b> ${p.Meds}<br>
+<b>Allergies:</b> ${p.Allergies}
 </div>
 
-<div class="soap-section">
-<div class="soap-title">O: Objective</div>
-Telehealth evaluation
-</div>
-
-<div class="soap-section">
-<div class="soap-title">A: Assessment</div>
-
-<select id="icdSelect">
-  <option value="">-- Select ICD-10 --</option>
-  <option>H10.3 – Acute conjunctivitis</option>
-  <option>H10.45 – Chronic allergic conjunctivitis</option>
-  <option>H01.00 – Blepharitis</option>
-  <option>H00.019 – Hordeolum externum</option>
-  <option>H00.029 – Hordeolum internum</option>
-  <option>H00.19 – Chalazion</option>
-  <option>H04.12 – Dry eye</option>
-  <option>H11.3 – Subconjunctival hemorrhage</option>
-  <option>H57.1 – Ocular pain</option>
-  <option value="other">Other</option>
-</select>
-
-<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
-
-<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
-</div>
-
-<div class="soap-section">
-<div class="soap-title">P: Plan</div>
-<textarea></textarea><br>
-<b>Follow-Up:</b><br>
-<textarea></textarea>
-</div>
-
-<div class="signature">
-<br><br>
-_________________________<br>
-${doctorName}<br>
-NPI: ${providers[doctorName].npi}
-</div>
-
-<button onclick="window.print()">Print / Save PDF</button>
-<button onclick="removePatient(${i})">Remove Patient</button>
-
-</div>
+<button onclick="window.print()">Print</button>
+<button onclick="loadProvider()">Back</button>
 `;
-}
-
-document.addEventListener("change", function(e){
-
-  if(e.target && e.target.id === "icdSelect"){
-
-    const custom = document.getElementById("customICD");
-    const box = document.getElementById("assessmentBox");
-
-    if(e.target.value === "other"){
-      custom.style.display = "block";
-      return;
-    } else {
-      custom.style.display = "none";
-    }
-
-    if(e.target.value && box){
-      box.value = e.target.value;
-    }
-  }
-
-});
-
-function updateDoctor(){
-  doctorName = document.getElementById("doctorSelect").value;
-  openChart(currentIndex);
-}
-
-function removePatient(index){
-  if(!confirm("Are you sure you want to remove this patient?")) return;
-  let patients = JSON.parse(localStorage.getItem("patients")) || [];
-  patients.splice(index, 1);
-  localStorage.setItem("patients", JSON.stringify(patients));
-  loadProvider();
 }
 
 function join(){
