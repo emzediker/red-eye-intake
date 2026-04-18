@@ -22,6 +22,7 @@
     .step { display: none; }
     .active { display: block; }
 
+    /* 🔥 BULLETPROOF CHECKBOX LAYOUT */
     .check-row {
       display: grid;
       grid-template-columns: 20px auto;
@@ -36,9 +37,7 @@
       padding: 10px;
     }
 
-    textarea {
-      min-height: 80px;
-    }
+    textarea { min-height: 80px; }
 
     button {
       padding: 12px;
@@ -128,15 +127,47 @@
   <button onclick="nextStep(5)">Next</button>
 </div>
 
-<!-- STEP 5: HISTORY -->
+<!-- STEP 5: FULL HISTORY -->
 <div id="step5" class="step">
-  <p><b>Medical History</b></p>
+  <p><b>Clinical Information</b></p>
 
   <label>Chief Complaint</label>
-  <textarea></textarea>
+  <textarea id="cc"></textarea>
+
+  <label>Duration</label>
+  <select id="duration">
+    <option>Today</option>
+    <option>1-2 days</option>
+    <option>3-5 days</option>
+    <option>1 week+</option>
+  </select>
+
+  <label>Contact lens wearer?</label>
+  <select id="contacts">
+    <option>No</option>
+    <option>Yes</option>
+  </select>
+
+  <p><b>Medical History</b></p>
+
+  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
+  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
+  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
+  <div class="check-row"><input type="checkbox"><span>Depression</span></div>
+  <div class="check-row"><input type="checkbox"><span>None</span></div>
+
+  <input type="text" placeholder="Other medical history">
 
   <label>Current Medications</label>
   <textarea></textarea>
+
+  <label>Medication Allergies</label>
+  <input type="text">
+
+  <label>Family Medical History</label>
+  <input type="text">
 
   <button onclick="submitForm()">Submit</button>
 </div>
@@ -151,24 +182,20 @@ let patient = {};
 function validateContact(){
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
-  const email = document.getElementById("email").value.trim();
 
   if(!name || !phone){
-    alert("Please enter your name and phone number.");
+    alert("Please enter your name and phone.");
     return;
   }
 
-  // store for later use
   patient.name = name;
   patient.phone = phone;
-  patient.email = email;
 
   nextStep(2);
 }
 
 function nextStep(step){
 
-  // 🚫 EARLY STOP
   if(step === 5){
     const highRisk =
       visionLoss.checked || pain.checked || light.checked ||
@@ -179,7 +206,7 @@ function nextStep(step){
 
       result.innerHTML = `
         <div class="result red">
-          🚫 Based on your symptoms, you should be evaluated in person.
+          🚫 ${patient.name}, you should be evaluated in person.
         </div>`;
       return;
     }
