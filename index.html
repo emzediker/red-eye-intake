@@ -242,7 +242,9 @@ fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V4
 .then(res => res.json())
 .then(patients => {
 
-if(patients.length===0){
+console.log("RAW DATA:", patients);
+
+if(!patients || patients.length===0){
 document.getElementById("app").innerHTML="No patients yet";
 return;
 }
@@ -252,16 +254,25 @@ sheetPatients = patients;
 let html="<h2>Patient Queue</h2>";
 
 patients.forEach((p,i)=>{
+
+let name = p.Name || p.name || "No name";
+let phone = p.Phone || p.phone || "";
+let time = p.Time || p.time || "";
+
 html+=`
 <div class="card" onclick="openChart(${i})">
-<b>${p.Name}</b><br>
-${p.Phone}<br>
-${p.Time}
+<b>${name}</b><br>
+${phone}<br>
+${time}
 </div>`;
 });
 
 document.getElementById("app").innerHTML=html;
 
+})
+.catch(err=>{
+console.error("FETCH ERROR:", err);
+document.getElementById("app").innerHTML="Error loading patients";
 });
 }
 
@@ -270,22 +281,32 @@ function openChart(i){
 currentIndex = i;
 let p = sheetPatients[i];
 
+let name = p.Name || p.name || "";
+let phone = p.Phone || p.phone || "";
+let time = p.Time || p.time || "";
+let cc = p.CC || p.cc || "";
+let symptoms = p.Symptoms || p.symptoms || "";
+let medHx = p.MedHx || p.medHx || "";
+let famHx = p.FamHx || p.famHx || "";
+let meds = p.Meds || p.meds || "";
+let allergies = p.Allergies || p.allergies || "";
+
 document.getElementById("app").innerHTML=`
 
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${p.Name}<br>
-<b>Phone:</b> ${p.Phone}<br>
-<b>Date:</b> ${p.Time}<br><br>
+<b>Name:</b> ${name}<br>
+<b>Phone:</b> ${phone}<br>
+<b>Date:</b> ${time}<br><br>
 
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
-<b>Chief Complaint:</b> ${p.CC}<br>
-<b>Symptoms:</b> ${p.Symptoms}<br>
-<b>Medical History:</b> ${p.MedHx}<br>
-<b>Family History:</b> ${p.FamHx}<br>
-<b>Medications:</b> ${p.Meds}<br>
-<b>Allergies:</b> ${p.Allergies}
+<b>Chief Complaint:</b> ${cc}<br>
+<b>Symptoms:</b> ${symptoms}<br>
+<b>Medical History:</b> ${medHx}<br>
+<b>Family History:</b> ${famHx}<br>
+<b>Medications:</b> ${meds}<br>
+<b>Allergies:</b> ${allergies}
 </div>
 
 <button onclick="window.print()">Print</button>
