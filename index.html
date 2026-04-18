@@ -49,48 +49,168 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-const providers = {
-  "Emily Zediker, OD": { npi: "1790349074" },
-  "Sophia Brown, OD": { npi: "1750279949" }
-};
-
-let doctorName = "Emily Zediker, OD";
-let currentIndex = null;
+// ================= GLOBAL =================
 let sheetPatients = [];
+let currentIndex = null;
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
 
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
+// ================= PATIENT =================
+
+function loadPatient(){
+document.getElementById("app").innerHTML=`
+
+<div class="step active" id="step1">
+
+<div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
+This tool helps determine if your condition is appropriate for telehealth.
+If you have pain, light sensitivity, or vision loss, you should be seen in person.
+</div>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Phone Number">
+
+<button onclick="validate()">Next</button>
+</div>
+
+<div class="step" id="step2">
+<p><b>Symptoms</b></p>
+
+${cb("redness","Red eye")}
+${cb("itching","Itching")}
+${cb("discharge","Discharge")}
+${cb("lid","Stye / lid bump")}
+${cb("irritation","Irritation")}
+${cb("noneSymptoms","None of the above")}
+
+<button onclick="next(3)">Next</button>
+</div>
+
+<div class="step" id="step3">
+<p><b>Do you have any of the following symptoms?</b></p>
+
+${cb("vision","Vision loss")}
+${cb("pain","Severe pain")}
+${cb("light","Light sensitivity")}
+${cb("trauma","Trauma")}
+${cb("chemical","Chemical exposure")}
+${cb("cl","Contact lens pain")}
+${cb("noneRF","None of the above")}
+
+<button onclick="next(4)">Next</button>
+</div>
+
+<div class="step" id="step4">
+
+<textarea id="cc" placeholder="Chief Complaint"></textarea>
+
+<p><b>Medical History</b></p>
+${medHx("mh_")}
+<input id="mh_other" placeholder="Other medical history">
+
+<p><b>Family History</b></p>
+${medHx("fh_")}
+<input id="fh_other" placeholder="Other family history">
+
+<textarea id="meds" placeholder="Medications"></textarea>
+<input id="allergies" placeholder="Allergies">
+
+<button onclick="submitForm()">Submit</button>
+</div>
+`;
+}
+
+function cb(id,label){
+return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
+}
+
+function medHx(prefix){
+return `
+${cb(prefix+"diabetes","Diabetes")}
+${cb(prefix+"htn","Hypertension")}
+${cb(prefix+"chol","High cholesterol")}
+${cb(prefix+"cancer","Cancer")}
+${cb(prefix+"autoimmune","Autoimmune")}
+${cb(prefix+"thyroid","Thyroid")}
+${cb(prefix+"asthma","Asthma")}
+${cb(prefix+"heart","Heart disease")}
+${cb(prefix+"none","None")}
+`;
+}
+
+function validate(){
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
+
+if(!name||!phone){alert("Enter info");return;}
+
+patient.name=name;
+patient.phone=phone;
+
+next(2);
+}
+
+function next(step){
+
+if(step===4){
+if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
+return;
+}}
+
+document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+document.getElementById("step"+step).classList.add("active");
+}
+
+// ================= SUBMIT =================
+
+function submitForm(){
+
+fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    name: patient.name,
+    phone: patient.phone,
+    cc: cc.value,
+    symptoms: "",
+    medHx: "",
+    famHx: "",
+    meds: meds.value,
+    allergies: allergies.value
+  })
+});
+
+document.getElementById("app").innerHTML=`
+<div class="result green">
+✅ Submitted
+</div>`;
+}
+
 // ================= PROVIDER =================
 
 function loadProvider(){
 
 fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec")
-.then(res => res.json())
-.then(patients => {
+.then(res=>res.json())
+.then(patients=>{
 
-if(!patients || patients.length===0){
-document.getElementById("app").innerHTML="No patients yet";
+if(!patients.length){
+document.getElementById("app").innerHTML="No patients";
 return;
 }
 
-sheetPatients = patients;
+sheetPatients=patients;
 
 let html="<h2>Patient Queue</h2>";
 
 patients.forEach((p,i)=>{
-
-let name = p.Name || p.name || "No name";
-let phone = p.Phone || p.phone || "";
-let time = p.Time || p.time || "";
-
 html+=`
 <div class="card" onclick="openChart(${i})">
-<b>${name}</b><br>
-${phone}<br>
-${time}
+<b>${p.Name||p.name}</b><br>
+${p.Phone||p.phone}
 </div>`;
 });
 
@@ -101,131 +221,17 @@ document.getElementById("app").innerHTML=html;
 
 function openChart(i){
 
-currentIndex = i;
-let p = sheetPatients[i];
-
-let name = p.Name || "";
-let phone = p.Phone || "";
-let time = p.Time || "";
-let cc = p.CC || "";
-let symptoms = p.Symptoms || "";
-let medHx = p.MedHx || "";
-let famHx = p.FamHx || "";
-let meds = p.Meds || "";
-let allergies = p.Allergies || "";
-
-// 🔥 PDF NAME FIX
-let cleanName = name.replace(/\s+/g, "_");
-let date = new Date().toISOString().split("T")[0];
-document.title = cleanName + "_" + date;
+currentIndex=i;
+let p=sheetPatients[i];
 
 document.getElementById("app").innerHTML=`
-
-<div class="print-container">
-
 <h2>Medical Record</h2>
 
-<b>Name:</b> ${name}<br>
-<b>Phone:</b> ${phone}<br>
-<b>Date:</b> ${time}<br><br>
+<b>Name:</b> ${p.Name||p.name}<br>
+<b>Phone:</b> ${p.Phone||p.phone}<br>
 
-<div class="soap-section">
-<div class="soap-title">S: Subjective</div>
-<b>Chief Complaint:</b> ${cc}<br>
-<b>Symptoms:</b> ${symptoms}<br>
-<b>Medical History:</b> ${medHx}<br>
-<b>Family History:</b> ${famHx}<br>
-<b>Medications:</b> ${meds}<br>
-<b>Allergies:</b> ${allergies}
-</div>
-
-<div class="soap-section">
-<div class="soap-title">O: Objective</div>
-<textarea placeholder="Lids/Lashes, Conjunctiva, Cornea, AC, Pupils, EOMs"></textarea>
-</div>
-
-<div class="soap-section">
-<div class="soap-title">A: Assessment</div>
-
-<select id="icdSelect">
-  <option value="">-- Select ICD-10 --</option>
-  <option>H10.3 – Acute conjunctivitis</option>
-  <option>H10.45 – Chronic allergic conjunctivitis</option>
-  <option>H01.00 – Blepharitis</option>
-  <option>H00.019 – Hordeolum externum</option>
-  <option>H00.029 – Hordeolum internum</option>
-  <option>H00.19 – Chalazion</option>
-  <option>H04.12 – Dry eye</option>
-  <option>H11.3 – Subconjunctival hemorrhage</option>
-  <option>H57.1 – Ocular pain</option>
-  <option value="other">Other</option>
-</select>
-
-<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
-<textarea id="assessmentBox"></textarea>
-
-</div>
-
-<div class="soap-section">
-<div class="soap-title">P: Plan</div>
-<textarea></textarea><br>
-<b>Follow-Up:</b><br>
-<textarea></textarea>
-</div>
-
-<div class="signature">
-<br><br>
-_________________________<br>
-<select id="doctorSelect" onchange="updateDoctor()">
-  <option value="Emily Zediker, OD">Emily Zediker, OD</option>
-  <option value="Sophia Brown, OD">Sophia Brown, OD</option>
-</select><br>
-<span id="npi"></span>
-</div>
-
-<button onclick="window.print()">Print / Save PDF</button>
-<button onclick="removePatient()">Remove Patient</button>
-<button onclick="loadProvider()">Back to Queue</button>
-
-</div>
+<button onclick="loadProvider()">Back</button>
 `;
-
-updateDoctor();
-}
-
-// ICD autofill
-document.addEventListener("change", function(e){
-
-if(e.target.id==="icdSelect"){
-const box=document.getElementById("assessmentBox");
-const custom=document.getElementById("customICD");
-
-if(e.target.value==="other"){
-custom.style.display="block";
-}else{
-custom.style.display="none";
-if(box) box.value=e.target.value;
-}
-}
-
-});
-
-function updateDoctor(){
-let d=document.getElementById("doctorSelect").value;
-document.getElementById("npi").innerText="NPI: "+providers[d].npi;
-}
-
-// 🔥 REMOVE PATIENT
-function removePatient(){
-
-if(!confirm("Remove this patient from queue?")) return;
-
-sheetPatients.splice(currentIndex,1);
-loadProvider();
-}
-
-function join(){
-window.location.href="https://doxy.me/YOURROOM";
 }
 
 </script>
