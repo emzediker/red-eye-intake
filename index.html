@@ -206,10 +206,25 @@ allergies:allergies.value,
 time:new Date().toLocaleString()
 };
 
+// KEEP LOCAL STORAGE
 let all = JSON.parse(localStorage.getItem("patients")) || [];
 all.push(newPatient);
-
 localStorage.setItem("patients", JSON.stringify(all));
+
+// ✅ SEND TO GOOGLE SHEETS
+fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    name: patient.name,
+    phone: patient.phone,
+    cc: cc.value,
+    symptoms: symptoms.join(", "),
+    medHx: collect("mh_").join(", "),
+    famHx: collect("fh_").join(", "),
+    meds: meds.value,
+    allergies: allergies.value
+  })
+});
 
 document.getElementById("app").innerHTML=`
 <div class="result green">
@@ -333,7 +348,6 @@ NPI: ${providers[doctorName].npi}
 `;
 }
 
-// ICD auto-fill
 document.addEventListener("change", function(e){
 
   if(e.target && e.target.id === "icdSelect"){
