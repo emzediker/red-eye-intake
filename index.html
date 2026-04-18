@@ -1,258 +1,227 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Texas Virtual Eye Care – Red Eye & Stye</title>
+<title>Texas Virtual Eye Care</title>
 
-  <style>
-    body { font-family: Arial; max-width: 520px; margin: 40px auto; }
-    h1 { text-align: center; }
-    .subtitle { text-align: center; color: gray; font-size: 14px; margin-bottom: 20px; }
+<style>
+body { font-family: Arial; max-width: 520px; margin: 40px auto; }
+.step { display:none; }
+.active { display:block; }
 
-    .step { display: none; }
-    .active { display: block; }
+.check-row {
+  display:grid;
+  grid-template-columns:20px auto;
+  gap:6px;
+  margin-bottom:6px;
+}
 
-    .check-row {
-      display: grid;
-      grid-template-columns: 20px auto;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
+textarea,input,select { width:100%; margin-bottom:12px; padding:8px; }
 
-    input, textarea, select {
-      width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-    }
+button { width:100%; padding:12px; margin-top:10px; }
 
-    textarea { min-height: 80px; }
+.result { padding:15px; border-radius:8px; }
+.green { background:#e6ffe6; }
+.red { background:#ffe5e5; }
+</style>
 
-    button {
-      padding: 12px;
-      width: 100%;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      background: #e0e0e0;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-
-    .green { background:#e6ffe6; color:#006600; }
-    .red { background:#ffe5e5; color:#cc0000; }
-
-    .disclaimer {
-      background:#f5f5f5;
-      padding:15px;
-      border-radius:8px;
-      font-size:14px;
-    }
-  </style>
 </head>
 
 <body>
-
-<h1>Texas Virtual Eye Care – Red Eye & Stye</h1>
-<p class="subtitle">Telehealth for non-emergency eye conditions in Texas only</p>
 
 <div id="app"></div>
 
 <script>
 
-// 🔐 Provider mode detection
-const urlParams = new URLSearchParams(window.location.search);
-const isProvider = urlParams.get("provider") === "1";
+const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
+let patient={};
 
-let patient = {};
+if(isProvider){ loadProvider(); } else { loadPatient(); }
 
-// 🚀 If provider → skip intake
-if(isProvider){
-  loadProviderDashboard();
-} else {
-  loadPatientFlow();
+// ================= PATIENT =================
+
+function loadPatient(){
+document.getElementById("app").innerHTML=`
+
+<div id="step1" class="step active">
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<button onclick="validate()">Next</button>
+</div>
+
+<div id="step2" class="step">
+<p>Symptoms</p>
+${cb("redness","Red eye")}
+${cb("itching","Itching")}
+${cb("discharge","Discharge")}
+${cb("lid","Stye")}
+<button onclick="next(3)">Next</button>
+</div>
+
+<div id="step3" class="step">
+<p>Red Flags</p>
+${cb("vision","Vision loss")}
+${cb("pain","Severe pain")}
+${cb("light","Light sensitivity")}
+${cb("trauma","Trauma")}
+${cb("chemical","Chemical")}
+${cb("cl","Contact lens pain")}
+${cb("noneRF","None of the above")}
+<button onclick="next(4)">Next</button>
+</div>
+
+<div id="step4" class="step">
+
+<textarea id="cc" placeholder="Chief complaint"></textarea>
+
+<p><b>Medical History</b></p>
+${medHx("mh_")}
+
+<p><b>Family History</b></p>
+${medHx("fh_")}
+
+<textarea id="meds" placeholder="Medications"></textarea>
+<input id="allergies" placeholder="Allergies">
+
+<button onclick="submitForm()">Submit</button>
+</div>
+
+<div id="result"></div>
+
+`;
 }
 
-// ================= PATIENT FLOW =================
-
-function loadPatientFlow(){
-  document.getElementById("app").innerHTML = `
-    <div id="step1" class="step active">
-      <p><b>Patient Information</b></p>
-      <input type="text" id="name" placeholder="Full Name">
-      <input type="tel" id="phone" placeholder="Phone">
-      <button onclick="validateContact()">Next</button>
-    </div>
-
-    <div id="step2" class="step">
-      <div class="disclaimer">
-        Pain, light sensitivity, or vision changes should be evaluated in person.
-      </div>
-      <button onclick="nextStep(3)">Continue</button>
-    </div>
-
-    <div id="step3" class="step">
-      <p><b>Symptoms</b></p>
-      ${checkbox("redness","Red eye")}
-      ${checkbox("itching","Itching")}
-      ${checkbox("discharge","Discharge")}
-      ${checkbox("lidBump","Stye / lid bump")}
-      ${checkbox("irritation","Irritation")}
-      <button onclick="nextStep(4)">Next</button>
-    </div>
-
-    <div id="step4" class="step">
-      <p><b>Red Flags</b></p>
-      ${checkbox("visionLoss","Vision loss")}
-      ${checkbox("pain","Severe pain")}
-      ${checkbox("light","Light sensitivity")}
-      ${checkbox("trauma","Trauma")}
-      ${checkbox("chemical","Chemical exposure")}
-      ${checkbox("contactLensPain","Contact lens pain")}
-      <button onclick="nextStep(5)">Next</button>
-    </div>
-
-    <div id="step5" class="step">
-      <p><b>Clinical Info</b></p>
-
-      <textarea id="cc" placeholder="Chief complaint"></textarea>
-
-      <select id="duration">
-        <option>Today</option>
-        <option>1-2 days</option>
-        <option>3-5 days</option>
-        <option>1 week+</option>
-      </select>
-
-      <select id="contacts">
-        <option>No contact lenses</option>
-        <option>Contact lens wearer</option>
-      </select>
-
-      <p><b>Medical History</b></p>
-      ${checkbox("mh_diabetes","Diabetes")}
-      ${checkbox("mh_htn","Hypertension")}
-      ${checkbox("mh_chol","High cholesterol")}
-      ${checkbox("mh_autoimmune","Autoimmune")}
-      ${checkbox("mh_none","None")}
-
-      <textarea id="meds" placeholder="Medications"></textarea>
-      <input type="text" id="allergies" placeholder="Allergies">
-
-      <button onclick="submitForm()">Submit</button>
-    </div>
-
-    <div id="result"></div>
-  `;
+function cb(id,label){
+return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
 }
 
-function checkbox(id,label){
-  return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
+function medHx(prefix){
+return `
+${cb(prefix+"diabetes","Diabetes")}
+${cb(prefix+"htn","Hypertension")}
+${cb(prefix+"chol","High cholesterol")}
+${cb(prefix+"cancer","Cancer")}
+${cb(prefix+"autoimmune","Autoimmune")}
+${cb(prefix+"thyroid","Thyroid")}
+${cb(prefix+"asthma","Asthma")}
+${cb(prefix+"heart","Heart disease")}
+${cb(prefix+"none","None")}
+`;
 }
 
-// ================= FLOW LOGIC =================
+// ================= FLOW =================
 
-function validateContact(){
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
+function validate(){
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
 
-  if(!name || !phone){
-    alert("Enter name and phone");
-    return;
-  }
+if(!name||!phone){alert("Enter info");return;}
 
-  patient.name = name;
-  patient.phone = phone;
-
-  nextStep(2);
+patient.name=name;
+patient.phone=phone;
+next(2);
 }
 
-function nextStep(step){
+function next(step){
 
-  if(step === 5){
-    if(visionLoss.checked || pain.checked || light.checked || trauma.checked || chemical.checked || contactLensPain.checked){
-      document.getElementById("app").innerHTML =
-        "<div class='result red'>🚫 In-person care recommended</div>";
-      return;
-    }
-  }
+if(step===4){
+if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+document.getElementById("app").innerHTML="<div class='result red'>In person care needed</div>";
+return;
+}}
 
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-  document.getElementById("step"+step).classList.add("active");
+document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+document.getElementById("step"+step).classList.add("active");
 }
 
 // ================= SUBMIT =================
 
 function submitForm(){
 
-  const data = {
-    name: patient.name,
-    phone: patient.phone,
-    cc: cc.value,
-    meds: meds.value,
-    allergies: allergies.value
-  };
+let symptoms=[];
+if(redness.checked) symptoms.push("Red eye");
+if(itching.checked) symptoms.push("Itching");
+if(discharge.checked) symptoms.push("Discharge");
+if(lid.checked) symptoms.push("Stye");
 
-  localStorage.setItem("patientData", JSON.stringify(data));
+function collect(prefix){
+let arr=[];
+["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
+if(document.getElementById(prefix+x).checked){arr.push(x);}
+});
+return arr;
+}
 
-  document.getElementById("app").innerHTML = `
-    <div class="result green">
-      ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
-      <button onclick="joinNow()">Join Now</button>
-    </div>`;
+const data={
+name:patient.name,
+phone:patient.phone,
+cc:cc.value,
+symptoms:symptoms,
+medHx:collect("mh_"),
+famHx:collect("fh_"),
+meds:meds.value,
+allergies:allergies.value
+};
+
+localStorage.setItem("pt",JSON.stringify(data));
+
+document.getElementById("app").innerHTML=`
+<div class="result green">
+You may proceed<br><br>
+<button onclick="join()">Join Visit</button>
+</div>`;
 }
 
 // ================= PROVIDER =================
 
-function loadProviderDashboard(){
+function loadProvider(){
 
-  const data = JSON.parse(localStorage.getItem("patientData"));
+const data=JSON.parse(localStorage.getItem("pt"));
 
-  if(!data){
-    document.getElementById("app").innerHTML = "<p>No patient data yet</p>";
-    return;
-  }
-
-  document.getElementById("app").innerHTML = `
-    <h2>Provider Dashboard</h2>
-
-    <b>${data.name}</b><br>
-    ${data.phone}<br><br>
-
-    <button onclick="generateChart()">Generate Chart</button>
-  `;
+if(!data){
+document.getElementById("app").innerHTML="No patient yet";
+return;
 }
 
-function generateChart(){
+document.getElementById("app").innerHTML=`
+<h2>Provider Dashboard</h2>
 
-  const data = JSON.parse(localStorage.getItem("patientData"));
+<b>${data.name}</b><br>${data.phone}<br><br>
 
-  document.getElementById("app").innerHTML = `
-    <h2>Medical Record</h2>
-
-    <b>Name:</b> ${data.name}<br>
-    <b>Phone:</b> ${data.phone}<br><br>
-
-    <b>Chief Complaint:</b><br>${data.cc}<br><br>
-
-    <b>Medications:</b><br>${data.meds}<br><br>
-    <b>Allergies:</b><br>${data.allergies}<br><br>
-
-    <b>Assessment:</b><br><textarea></textarea><br><br>
-    <b>Plan:</b><br><textarea></textarea><br><br>
-    <b>Follow-Up:</b><br><textarea></textarea><br><br>
-
-    <button onclick="window.print()">Print</button>
-  `;
+<button onclick="chart()">Generate Chart</button>
+`;
 }
 
-function joinNow(){
-  window.location.href="https://doxy.me/YOURROOM";
+function chart(){
+
+const d=JSON.parse(localStorage.getItem("pt"));
+
+document.getElementById("app").innerHTML=`
+
+<h2>Medical Record</h2>
+
+<b>Name:</b> ${d.name}<br>
+<b>Phone:</b> ${d.phone}<br><br>
+
+<b>CC:</b><br>${d.cc}<br><br>
+
+<b>Symptoms:</b><br>${d.symptoms.join(", ")}<br><br>
+
+<b>Medical History:</b><br>${d.medHx.join(", ")}<br><br>
+<b>Family History:</b><br>${d.famHx.join(", ")}<br><br>
+
+<b>Medications:</b><br>${d.meds}<br><br>
+<b>Allergies:</b><br>${d.allergies}<br><br>
+
+<b>Assessment:</b><br><textarea></textarea><br>
+<b>Plan:</b><br><textarea></textarea><br>
+<b>Follow-Up:</b><br><textarea></textarea><br><br>
+
+<button onclick="window.print()">Print</button>
+`;
+}
+
+function join(){
+window.location.href="https://doxy.me/YOURROOM";
 }
 
 </script>
