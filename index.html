@@ -64,6 +64,7 @@
 <!-- STEP 1 -->
 <div id="step1" class="step active">
   <p><b>Patient Information</b></p>
+
   <label>Full Name</label>
   <input type="text" id="name">
 
@@ -131,16 +132,14 @@
   </select>
 
   <p><b>Medical History</b></p>
-  <div class="check-row"><input type="checkbox" id="mh_diabetes"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_htn"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_chol"><span>High cholesterol</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_cancer"><span>Cancer</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_autoimmune"><span>Autoimmune disease</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_thyroid"><span>Thyroid disease</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_asthma"><span>Asthma</span></div>
-  <div class="check-row"><input type="checkbox" id="mh_none"><span>None</span></div>
-
-  <input type="text" id="mh_other" placeholder="Other medical history">
+  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
+  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
+  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
+  <div class="check-row"><input type="checkbox"><span>Thyroid disease</span></div>
+  <div class="check-row"><input type="checkbox"><span>Asthma</span></div>
+  <div class="check-row"><input type="checkbox"><span>None</span></div>
 
   <label>Medications</label>
   <textarea id="meds"></textarea>
@@ -149,14 +148,12 @@
   <input type="text" id="allergies">
 
   <p><b>Family History</b></p>
-  <div class="check-row"><input type="checkbox" id="fh_diabetes"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_htn"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_glaucoma"><span>Glaucoma</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_macular"><span>Macular degeneration</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_rd"><span>Retinal detachment</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_none"><span>None</span></div>
-
-  <input type="text" id="fh_other" placeholder="Other family history">
+  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
+  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
+  <div class="check-row"><input type="checkbox"><span>Glaucoma</span></div>
+  <div class="check-row"><input type="checkbox"><span>Macular degeneration</span></div>
+  <div class="check-row"><input type="checkbox"><span>Retinal detachment</span></div>
+  <div class="check-row"><input type="checkbox"><span>None</span></div>
 
   <button onclick="submitForm()">Submit</button>
 </div>
@@ -165,14 +162,19 @@
 
 <script>
 
+// 🔐 PROVIDER MODE
+const urlParams = new URLSearchParams(window.location.search);
+const isProvider = urlParams.get("provider") === "1";
+
 let patient = {};
 
+// ✅ FIXED FUNCTION
 function validateContact(){
-  const name = name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
 
   if(!name || !phone){
-    alert("Enter name and phone");
+    alert("Please enter your name and phone.");
     return;
   }
 
@@ -201,16 +203,23 @@ function nextStep(step){
 }
 
 function submitForm(){
+
+  let providerButton = "";
+
+  if(isProvider){
+    providerButton = `<button onclick="generateChart()">Generate Chart</button>`;
+  }
+
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 
   result.innerHTML = `
     <div class="result green">
       ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
       <button onclick="joinNow()">Join Now</button>
+      ${providerButton}
     </div>`;
 }
 
-/* 🔒 PROVIDER ONLY FUNCTION */
 function generateChart(){
 
   const cc = document.getElementById("cc").value;
@@ -219,10 +228,12 @@ function generateChart(){
 
   document.body.innerHTML = `
     <h2>Medical Record</h2>
+
     <b>Name:</b> ${patient.name}<br>
     <b>Phone:</b> ${patient.phone}<br><br>
 
     <b>Chief Complaint:</b><br>${cc}<br><br>
+
     <b>Medications:</b><br>${meds}<br><br>
     <b>Allergies:</b><br>${allergies}<br><br>
 
