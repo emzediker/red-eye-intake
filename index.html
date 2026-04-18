@@ -49,7 +49,6 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
-// PROVIDERS
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
   "Sophia Brown, OD": { npi: "1750279949" }
@@ -297,6 +296,7 @@ Telehealth evaluation
 <select id="icdSelect">
   <option value="">-- Select ICD-10 --</option>
   <option>H10.3 – Acute conjunctivitis</option>
+  <option>H10.45 – Chronic allergic conjunctivitis</option>
   <option>H01.00 – Blepharitis</option>
   <option>H00.019 – Hordeolum externum</option>
   <option>H00.029 – Hordeolum internum</option>
@@ -309,7 +309,7 @@ Telehealth evaluation
 
 <input id="customICD" placeholder="Enter ICD-10" style="display:none;">
 
-<textarea placeholder="Assessment notes"></textarea>
+<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
 </div>
 
 <div class="soap-section">
@@ -333,15 +333,26 @@ NPI: ${providers[doctorName].npi}
 `;
 }
 
+// ICD auto-fill
 document.addEventListener("change", function(e){
+
   if(e.target && e.target.id === "icdSelect"){
+
     const custom = document.getElementById("customICD");
+    const box = document.getElementById("assessmentBox");
+
     if(e.target.value === "other"){
       custom.style.display = "block";
+      return;
     } else {
       custom.style.display = "none";
     }
+
+    if(e.target.value && box){
+      box.value = e.target.value;
+    }
   }
+
 });
 
 function updateDoctor(){
