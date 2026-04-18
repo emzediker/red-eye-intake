@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Eyecare Teledoc Intake</title>
+    <title>Red Eye Intake</title>
 
     <style>
       body {
@@ -23,12 +23,8 @@
         display: block;
       }
 
-      .box {
-        margin-top: 20px;
-      }
-
       button {
-        margin-top: 20px;
+        margin-top: 15px;
         padding: 12px;
         font-size: 16px;
         width: 100%;
@@ -64,57 +60,47 @@
   <body>
     <h1>Eyecare Teledoc Intake</h1>
 
-    <!-- STEP 1: DISCLAIMER -->
+    <!-- STEP 1 -->
     <div id="step1" class="step active">
       <div class="disclaimer">
         <strong>Important Information:</strong><br /><br />
-        This optometric telehealth tool is designed to help identify patients who may be appropriate
-        for virtual care for non-emergency eye conditions (such as irritation, allergy, or stye).<br /><br />
-
-        Some eye symptoms may indicate more serious conditions that require an in-person evaluation.
-        Pain—especially when associated with light sensitivity or vision changes—should be evaluated
-        by an eye care professional in person.<br /><br />
-
-        This questionnaire does not provide a diagnosis. It is used to determine whether telehealth
-        may be appropriate for your situation.
+        This tool helps determine if you may be appropriate for virtual eye care.
+        It does not provide a diagnosis.<br /><br />
+        Pain, light sensitivity, or vision changes should be evaluated in person.
       </div>
 
       <button onclick="nextStep(2)">Start</button>
     </div>
 
-    <!-- STEP 2: SYMPTOMS -->
+    <!-- STEP 2 -->
     <div id="step2" class="step">
-      <p><strong>What symptoms are you experiencing? (Select all that apply)</strong></p>
+      <p><strong>Select your symptoms:</strong></p>
 
-      <div class="box">
-        <label><input type="checkbox" id="redness" /> Red eye</label><br />
-        <label><input type="checkbox" id="itching" /> Itching</label><br />
-        <label><input type="checkbox" id="discharge" /> Eye discharge</label><br />
-        <label><input type="checkbox" id="lidBump" /> Eyelid bump / stye</label><br />
-        <label><input type="checkbox" id="irritation" /> Mild irritation / dryness</label><br />
-        <label><input type="checkbox" id="none" /> None of the above</label><br />
-      </div>
+      <label><input type="checkbox" id="redness" onclick="handleNone('symptoms')" /> Red eye</label><br />
+      <label><input type="checkbox" id="itching" onclick="handleNone('symptoms')" /> Itching</label><br />
+      <label><input type="checkbox" id="discharge" onclick="handleNone('symptoms')" /> Discharge</label><br />
+      <label><input type="checkbox" id="lidBump" onclick="handleNone('symptoms')" /> Eyelid bump / stye</label><br />
+      <label><input type="checkbox" id="irritation" onclick="handleNone('symptoms')" /> Irritation</label><br />
+      <label><input type="checkbox" id="noneSymptoms" onclick="handleNone('symptoms')" /> None of the above</label><br />
 
       <button onclick="nextStep(3)">Next</button>
     </div>
 
-    <!-- STEP 3: RED FLAGS -->
+    <!-- STEP 3 -->
     <div id="step3" class="step">
       <p><strong>Do you have any of the following?</strong></p>
 
-      <div class="box">
-        <label><input type="checkbox" id="visionLoss" /> Decreased vision</label><br />
-        <label><input type="checkbox" id="pain" /> Moderate to severe eye pain</label><br />
-        <label><input type="checkbox" id="light" /> Light sensitivity</label><br />
-        <label><input type="checkbox" id="trauma" /> Recent trauma</label><br />
-        <label><input type="checkbox" id="chemical" /> Chemical exposure</label><br />
-        <label><input type="checkbox" id="contactLensPain" /> Contact lens use with pain</label><br />
-      </div>
+      <label><input type="checkbox" id="visionLoss" onclick="handleNone('redflags')" /> Decreased vision</label><br />
+      <label><input type="checkbox" id="pain" onclick="handleNone('redflags')" /> Moderate/severe pain</label><br />
+      <label><input type="checkbox" id="light" onclick="handleNone('redflags')" /> Light sensitivity</label><br />
+      <label><input type="checkbox" id="trauma" onclick="handleNone('redflags')" /> Trauma</label><br />
+      <label><input type="checkbox" id="chemical" onclick="handleNone('redflags')" /> Chemical exposure</label><br />
+      <label><input type="checkbox" id="contactLensPain" onclick="handleNone('redflags')" /> Contact lens pain</label><br />
+      <label><input type="checkbox" id="noneRedFlags" onclick="handleNone('redflags')" /> None of the above</label><br />
 
       <button onclick="runTriage()">Submit</button>
     </div>
 
-    <!-- RESULT -->
     <div id="result"></div>
 
     <script>
@@ -123,8 +109,43 @@
         document.getElementById("step" + step).classList.add("active");
       }
 
+      function handleNone(group) {
+        if (group === "symptoms") {
+          const none = document.getElementById("noneSymptoms");
+
+          const boxes = ["redness","itching","discharge","lidBump","irritation"];
+
+          if (none.checked) {
+            boxes.forEach(id => document.getElementById(id).checked = false);
+          } else {
+            boxes.forEach(id => {
+              if (document.getElementById(id).checked) {
+                none.checked = false;
+              }
+            });
+          }
+        }
+
+        if (group === "redflags") {
+          const none = document.getElementById("noneRedFlags");
+
+          const boxes = ["visionLoss","pain","light","trauma","chemical","contactLensPain"];
+
+          if (none.checked) {
+            boxes.forEach(id => document.getElementById(id).checked = false);
+          } else {
+            boxes.forEach(id => {
+              if (document.getElementById(id).checked) {
+                none.checked = false;
+              }
+            });
+          }
+        }
+      }
+
       function runTriage() {
-        const none = document.getElementById("none").checked;
+        const noneSymptoms = document.getElementById("noneSymptoms").checked;
+        const noneRedFlags = document.getElementById("noneRedFlags").checked;
 
         const visionLoss = document.getElementById("visionLoss").checked;
         const pain = document.getElementById("pain").checked;
@@ -133,49 +154,57 @@
         const chemical = document.getElementById("chemical").checked;
         const contactLensPain = document.getElementById("contactLensPain").checked;
 
+        const redness = document.getElementById("redness").checked;
         const itching = document.getElementById("itching").checked;
-        const lidBump = document.getElementById("lidBump").checked;
         const discharge = document.getElementById("discharge").checked;
+        const lidBump = document.getElementById("lidBump").checked;
+        const irritation = document.getElementById("irritation").checked;
 
         const resultBox = document.getElementById("result");
 
-        // HARD STOP
+        // RED FLAG CHECK
         const highRisk =
           visionLoss || pain || light || trauma || chemical || contactLensPain;
 
         if (highRisk) {
           resultBox.className = "result red";
           resultBox.innerText =
-            "🚫 Your symptoms suggest you should be evaluated in person as soon as possible.";
+            "🚫 Please seek in-person eye care as soon as possible.";
           return;
         }
 
-        // NONE SELECTED
-        if (none) {
+        // VALIDATION
+        if (noneSymptoms && !noneRedFlags) {
           resultBox.className = "result red";
           resultBox.innerText =
-            "⚠️ Please select at least one symptom so we can guide you appropriately.";
+            "⚠️ Please select at least one symptom.";
           return;
         }
 
-        // CLINICAL LOGIC
-        if (lidBump) {
+        const hasSymptoms =
+          redness || itching || discharge || lidBump || irritation;
+
+        if (hasSymptoms || (noneSymptoms && noneRedFlags)) {
           resultBox.className = "result green";
-          resultBox.innerText =
-            "✅ This may be a stye or eyelid inflammation. You are likely a good candidate for virtual care.";
-        } else if (itching && !pain && !light) {
-          resultBox.className = "result green";
-          resultBox.innerText =
-            "✅ Symptoms are consistent with allergic irritation. Virtual care may be appropriate.";
-        } else if (discharge && !pain) {
-          resultBox.className = "result green";
-          resultBox.innerText =
-            "✅ Possible conjunctivitis. You may be a candidate for virtual evaluation.";
+          resultBox.innerHTML = `
+            ✅ You are a candidate for virtual eye care.<br><br>
+
+            <button onclick="scheduleVisit()">Schedule a Visit</button>
+            <button onclick="joinNow()">Join Next Available</button>
+          `;
         } else {
           resultBox.className = "result red";
           resultBox.innerText =
-            "⚠️ Your symptoms are not clearly suitable for telehealth. In-person evaluation is recommended.";
+            "⚠️ We recommend an in-person evaluation.";
         }
+      }
+
+      function scheduleVisit() {
+        alert("Scheduling page coming next");
+      }
+
+      function joinNow() {
+        window.location.href = "https://doxy.me/YOURROOM";
       }
     </script>
   </body>
