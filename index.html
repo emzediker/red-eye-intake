@@ -4,20 +4,9 @@
   <title>Texas Virtual Eye Care – Red Eye & Stye</title>
 
   <style>
-    body {
-      font-family: Arial;
-      max-width: 520px;
-      margin: 40px auto;
-    }
-
+    body { font-family: Arial; max-width: 520px; margin: 40px auto; }
     h1 { text-align: center; }
-
-    .subtitle {
-      text-align: center;
-      color: gray;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
+    .subtitle { text-align: center; color: gray; font-size: 14px; margin-bottom: 20px; }
 
     .step { display: none; }
     .active { display: block; }
@@ -27,7 +16,7 @@
       grid-template-columns: 20px auto;
       align-items: center;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     input, textarea, select {
@@ -64,12 +53,6 @@
       border-radius:8px;
       font-size:14px;
     }
-
-    .provider-btn {
-      background:#333;
-      color:#fff;
-      margin-top:20px;
-    }
   </style>
 </head>
 
@@ -81,15 +64,11 @@
 <!-- STEP 1 -->
 <div id="step1" class="step active">
   <p><b>Patient Information</b></p>
-
   <label>Full Name</label>
   <input type="text" id="name">
 
-  <label>Phone Number</label>
+  <label>Phone</label>
   <input type="tel" id="phone">
-
-  <label>Email (optional)</label>
-  <input type="email" id="email">
 
   <button onclick="validateContact()">Next</button>
 </div>
@@ -97,7 +76,6 @@
 <!-- STEP 2 -->
 <div id="step2" class="step">
   <div class="disclaimer">
-    This tool helps determine if you may be appropriate for virtual care.
     Pain, light sensitivity, or vision changes should be evaluated in person.
   </div>
   <button onclick="nextStep(3)">Continue</button>
@@ -105,7 +83,7 @@
 
 <!-- STEP 3 -->
 <div id="step3" class="step">
-  <p><b>What symptoms are you experiencing?</b></p>
+  <p><b>Symptoms</b></p>
 
   <div class="check-row"><input type="checkbox" id="redness"><span>Red eye</span></div>
   <div class="check-row"><input type="checkbox" id="itching"><span>Itching</span></div>
@@ -119,7 +97,7 @@
 
 <!-- STEP 4 -->
 <div id="step4" class="step">
-  <p><b>Do you have any of the following?</b></p>
+  <p><b>Red Flags</b></p>
 
   <div class="check-row"><input type="checkbox" id="visionLoss"><span>Vision loss</span></div>
   <div class="check-row"><input type="checkbox" id="pain"><span>Severe pain</span></div>
@@ -127,14 +105,13 @@
   <div class="check-row"><input type="checkbox" id="trauma"><span>Trauma</span></div>
   <div class="check-row"><input type="checkbox" id="chemical"><span>Chemical exposure</span></div>
   <div class="check-row"><input type="checkbox" id="contactLensPain"><span>Contact lens pain</span></div>
-  <div class="check-row"><input type="checkbox" id="noneRedFlags"><span>None of the above</span></div>
 
   <button onclick="nextStep(5)">Next</button>
 </div>
 
 <!-- STEP 5 -->
 <div id="step5" class="step">
-  <p><b>Clinical Information</b></p>
+  <p><b>Clinical Info</b></p>
 
   <label>Chief Complaint</label>
   <textarea id="cc"></textarea>
@@ -153,32 +130,37 @@
     <option>Yes</option>
   </select>
 
-  <label><b>Medical History</b></label>
+  <p><b>Medical History</b></p>
   <div class="check-row"><input type="checkbox" id="mh_diabetes"><span>Diabetes</span></div>
   <div class="check-row"><input type="checkbox" id="mh_htn"><span>Hypertension</span></div>
   <div class="check-row"><input type="checkbox" id="mh_chol"><span>High cholesterol</span></div>
   <div class="check-row"><input type="checkbox" id="mh_cancer"><span>Cancer</span></div>
   <div class="check-row"><input type="checkbox" id="mh_autoimmune"><span>Autoimmune disease</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_thyroid"><span>Thyroid disease</span></div>
+  <div class="check-row"><input type="checkbox" id="mh_asthma"><span>Asthma</span></div>
   <div class="check-row"><input type="checkbox" id="mh_none"><span>None</span></div>
+
   <input type="text" id="mh_other" placeholder="Other medical history">
 
-  <label>Current Medications</label>
+  <label>Medications</label>
   <textarea id="meds"></textarea>
 
-  <label>Medication Allergies</label>
+  <label>Allergies</label>
   <input type="text" id="allergies">
 
-  <label><b>Family Medical History</b></label>
+  <p><b>Family History</b></p>
   <div class="check-row"><input type="checkbox" id="fh_diabetes"><span>Diabetes</span></div>
   <div class="check-row"><input type="checkbox" id="fh_htn"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox" id="fh_eye"><span>Eye disease</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_glaucoma"><span>Glaucoma</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_macular"><span>Macular degeneration</span></div>
+  <div class="check-row"><input type="checkbox" id="fh_rd"><span>Retinal detachment</span></div>
   <div class="check-row"><input type="checkbox" id="fh_none"><span>None</span></div>
+
   <input type="text" id="fh_other" placeholder="Other family history">
 
   <button onclick="submitForm()">Submit</button>
 </div>
 
-<!-- RESULT -->
 <div id="result"></div>
 
 <script>
@@ -186,11 +168,11 @@
 let patient = {};
 
 function validateContact(){
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
+  const name = name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
 
   if(!name || !phone){
-    alert("Please enter your name and phone.");
+    alert("Enter name and phone");
     return;
   }
 
@@ -209,11 +191,7 @@ function nextStep(step){
 
     if(highRisk){
       document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-
-      result.innerHTML = `
-        <div class="result red">
-          🚫 ${patient.name}, you should be evaluated in person.
-        </div>`;
+      result.innerHTML = "<div class='result red'>🚫 In-person care recommended</div>";
       return;
     }
   }
@@ -229,39 +207,22 @@ function submitForm(){
     <div class="result green">
       ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
       <button onclick="joinNow()">Join Now</button>
-      <button class="provider-btn" onclick="generateChart()">Provider: Generate Chart</button>
     </div>`;
 }
 
+/* 🔒 PROVIDER ONLY FUNCTION */
 function generateChart(){
 
-  const cc = cc = document.getElementById("cc").value;
-  const duration = document.getElementById("duration").value;
-  const contacts = document.getElementById("contacts").value;
+  const cc = document.getElementById("cc").value;
   const meds = document.getElementById("meds").value;
   const allergies = document.getElementById("allergies").value;
 
-  let symptoms = [];
-  if(redness.checked) symptoms.push("Red eye");
-  if(itching.checked) symptoms.push("Itching");
-  if(discharge.checked) symptoms.push("Discharge");
-  if(lidBump.checked) symptoms.push("Stye/lid bump");
-  if(irritation.checked) symptoms.push("Irritation");
-
   document.body.innerHTML = `
     <h2>Medical Record</h2>
-
     <b>Name:</b> ${patient.name}<br>
-    <b>Phone:</b> ${patient.phone}<br>
-    <b>Date:</b> ${new Date().toLocaleDateString()}<br><br>
+    <b>Phone:</b> ${patient.phone}<br><br>
 
     <b>Chief Complaint:</b><br>${cc}<br><br>
-
-    <b>Symptoms:</b><br>${symptoms.join(", ")}<br><br>
-
-    <b>Duration:</b> ${duration}<br>
-    <b>Contact Lens:</b> ${contacts}<br><br>
-
     <b>Medications:</b><br>${meds}<br><br>
     <b>Allergies:</b><br>${allergies}<br><br>
 
