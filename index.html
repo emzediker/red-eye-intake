@@ -22,16 +22,17 @@
     .step { display: none; }
     .active { display: block; }
 
+    /* ✅ FIXED CHECKBOX SPACING */
     .checkbox-group label {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 0;
+      gap: 4px;
+      padding: 4px 0;
       cursor: pointer;
     }
 
     input[type="checkbox"] {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
 
     input, textarea, select {
@@ -92,11 +93,11 @@
   <p><b>What symptoms are you experiencing?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="redness"> Red eye</label>
-    <label><input type="checkbox" id="itching"> Itching</label>
-    <label><input type="checkbox" id="discharge"> Discharge</label>
-    <label><input type="checkbox" id="lidBump"> Stye / lid bump</label>
-    <label><input type="checkbox" id="irritation"> Irritation</label>
+    <label><input type="checkbox" id="redness"> Red eye</label><br>
+    <label><input type="checkbox" id="itching"> Itching</label><br>
+    <label><input type="checkbox" id="discharge"> Discharge</label><br>
+    <label><input type="checkbox" id="lidBump"> Stye / lid bump</label><br>
+    <label><input type="checkbox" id="irritation"> Irritation</label><br>
     <label><input type="checkbox" id="noneSymptoms"> None of the above</label>
   </div>
 
@@ -108,12 +109,12 @@
   <p><b>Do you have any of the following?</b></p>
 
   <div class="checkbox-group">
-    <label><input type="checkbox" id="visionLoss"> Vision loss</label>
-    <label><input type="checkbox" id="pain"> Severe pain</label>
-    <label><input type="checkbox" id="light"> Light sensitivity</label>
-    <label><input type="checkbox" id="trauma"> Trauma</label>
-    <label><input type="checkbox" id="chemical"> Chemical exposure</label>
-    <label><input type="checkbox" id="contactLensPain"> Contact lens pain</label>
+    <label><input type="checkbox" id="visionLoss"> Vision loss</label><br>
+    <label><input type="checkbox" id="pain"> Severe pain</label><br>
+    <label><input type="checkbox" id="light"> Light sensitivity</label><br>
+    <label><input type="checkbox" id="trauma"> Trauma</label><br>
+    <label><input type="checkbox" id="chemical"> Chemical exposure</label><br>
+    <label><input type="checkbox" id="contactLensPain"> Contact lens pain</label><br>
     <label><input type="checkbox" id="noneRedFlags"> None of the above</label>
   </div>
 
@@ -143,12 +144,12 @@
 
   <p><b>Medical History</b></p>
   <div class="checkbox-group">
-    <label><input type="checkbox"> Diabetes</label>
-    <label><input type="checkbox"> Hypertension</label>
-    <label><input type="checkbox"> High cholesterol</label>
-    <label><input type="checkbox"> Cancer</label>
-    <label><input type="checkbox"> Autoimmune disease</label>
-    <label><input type="checkbox"> Depression</label>
+    <label><input type="checkbox"> Diabetes</label><br>
+    <label><input type="checkbox"> Hypertension</label><br>
+    <label><input type="checkbox"> High cholesterol</label><br>
+    <label><input type="checkbox"> Cancer</label><br>
+    <label><input type="checkbox"> Autoimmune disease</label><br>
+    <label><input type="checkbox"> Depression</label><br>
     <label><input type="checkbox"> None</label>
   </div>
 
