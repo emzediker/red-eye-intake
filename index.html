@@ -61,120 +61,108 @@
 <h1>Texas Virtual Eye Care – Red Eye & Stye</h1>
 <p class="subtitle">Telehealth for non-emergency eye conditions in Texas only</p>
 
-<!-- STEP 1 -->
-<div id="step1" class="step active">
-  <p><b>Patient Information</b></p>
-
-  <label>Full Name</label>
-  <input type="text" id="name">
-
-  <label>Phone</label>
-  <input type="tel" id="phone">
-
-  <button onclick="validateContact()">Next</button>
-</div>
-
-<!-- STEP 2 -->
-<div id="step2" class="step">
-  <div class="disclaimer">
-    Pain, light sensitivity, or vision changes should be evaluated in person.
-  </div>
-  <button onclick="nextStep(3)">Continue</button>
-</div>
-
-<!-- STEP 3 -->
-<div id="step3" class="step">
-  <p><b>Symptoms</b></p>
-
-  <div class="check-row"><input type="checkbox" id="redness"><span>Red eye</span></div>
-  <div class="check-row"><input type="checkbox" id="itching"><span>Itching</span></div>
-  <div class="check-row"><input type="checkbox" id="discharge"><span>Discharge</span></div>
-  <div class="check-row"><input type="checkbox" id="lidBump"><span>Stye / lid bump</span></div>
-  <div class="check-row"><input type="checkbox" id="irritation"><span>Irritation</span></div>
-  <div class="check-row"><input type="checkbox" id="noneSymptoms"><span>None of the above</span></div>
-
-  <button onclick="nextStep(4)">Next</button>
-</div>
-
-<!-- STEP 4 -->
-<div id="step4" class="step">
-  <p><b>Red Flags</b></p>
-
-  <div class="check-row"><input type="checkbox" id="visionLoss"><span>Vision loss</span></div>
-  <div class="check-row"><input type="checkbox" id="pain"><span>Severe pain</span></div>
-  <div class="check-row"><input type="checkbox" id="light"><span>Light sensitivity</span></div>
-  <div class="check-row"><input type="checkbox" id="trauma"><span>Trauma</span></div>
-  <div class="check-row"><input type="checkbox" id="chemical"><span>Chemical exposure</span></div>
-  <div class="check-row"><input type="checkbox" id="contactLensPain"><span>Contact lens pain</span></div>
-
-  <button onclick="nextStep(5)">Next</button>
-</div>
-
-<!-- STEP 5 -->
-<div id="step5" class="step">
-  <p><b>Clinical Info</b></p>
-
-  <label>Chief Complaint</label>
-  <textarea id="cc"></textarea>
-
-  <label>Duration</label>
-  <select id="duration">
-    <option>Today</option>
-    <option>1-2 days</option>
-    <option>3-5 days</option>
-    <option>1 week+</option>
-  </select>
-
-  <label>Contact lens wearer?</label>
-  <select id="contacts">
-    <option>No</option>
-    <option>Yes</option>
-  </select>
-
-  <p><b>Medical History</b></p>
-  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox"><span>High cholesterol</span></div>
-  <div class="check-row"><input type="checkbox"><span>Cancer</span></div>
-  <div class="check-row"><input type="checkbox"><span>Autoimmune disease</span></div>
-  <div class="check-row"><input type="checkbox"><span>Thyroid disease</span></div>
-  <div class="check-row"><input type="checkbox"><span>Asthma</span></div>
-  <div class="check-row"><input type="checkbox"><span>None</span></div>
-
-  <label>Medications</label>
-  <textarea id="meds"></textarea>
-
-  <label>Allergies</label>
-  <input type="text" id="allergies">
-
-  <p><b>Family History</b></p>
-  <div class="check-row"><input type="checkbox"><span>Diabetes</span></div>
-  <div class="check-row"><input type="checkbox"><span>Hypertension</span></div>
-  <div class="check-row"><input type="checkbox"><span>Glaucoma</span></div>
-  <div class="check-row"><input type="checkbox"><span>Macular degeneration</span></div>
-  <div class="check-row"><input type="checkbox"><span>Retinal detachment</span></div>
-  <div class="check-row"><input type="checkbox"><span>None</span></div>
-
-  <button onclick="submitForm()">Submit</button>
-</div>
-
-<div id="result"></div>
+<div id="app"></div>
 
 <script>
 
-// 🔐 PROVIDER MODE
+// 🔐 Provider mode detection
 const urlParams = new URLSearchParams(window.location.search);
 const isProvider = urlParams.get("provider") === "1";
 
 let patient = {};
 
-// ✅ FIXED FUNCTION
+// 🚀 If provider → skip intake
+if(isProvider){
+  loadProviderDashboard();
+} else {
+  loadPatientFlow();
+}
+
+// ================= PATIENT FLOW =================
+
+function loadPatientFlow(){
+  document.getElementById("app").innerHTML = `
+    <div id="step1" class="step active">
+      <p><b>Patient Information</b></p>
+      <input type="text" id="name" placeholder="Full Name">
+      <input type="tel" id="phone" placeholder="Phone">
+      <button onclick="validateContact()">Next</button>
+    </div>
+
+    <div id="step2" class="step">
+      <div class="disclaimer">
+        Pain, light sensitivity, or vision changes should be evaluated in person.
+      </div>
+      <button onclick="nextStep(3)">Continue</button>
+    </div>
+
+    <div id="step3" class="step">
+      <p><b>Symptoms</b></p>
+      ${checkbox("redness","Red eye")}
+      ${checkbox("itching","Itching")}
+      ${checkbox("discharge","Discharge")}
+      ${checkbox("lidBump","Stye / lid bump")}
+      ${checkbox("irritation","Irritation")}
+      <button onclick="nextStep(4)">Next</button>
+    </div>
+
+    <div id="step4" class="step">
+      <p><b>Red Flags</b></p>
+      ${checkbox("visionLoss","Vision loss")}
+      ${checkbox("pain","Severe pain")}
+      ${checkbox("light","Light sensitivity")}
+      ${checkbox("trauma","Trauma")}
+      ${checkbox("chemical","Chemical exposure")}
+      ${checkbox("contactLensPain","Contact lens pain")}
+      <button onclick="nextStep(5)">Next</button>
+    </div>
+
+    <div id="step5" class="step">
+      <p><b>Clinical Info</b></p>
+
+      <textarea id="cc" placeholder="Chief complaint"></textarea>
+
+      <select id="duration">
+        <option>Today</option>
+        <option>1-2 days</option>
+        <option>3-5 days</option>
+        <option>1 week+</option>
+      </select>
+
+      <select id="contacts">
+        <option>No contact lenses</option>
+        <option>Contact lens wearer</option>
+      </select>
+
+      <p><b>Medical History</b></p>
+      ${checkbox("mh_diabetes","Diabetes")}
+      ${checkbox("mh_htn","Hypertension")}
+      ${checkbox("mh_chol","High cholesterol")}
+      ${checkbox("mh_autoimmune","Autoimmune")}
+      ${checkbox("mh_none","None")}
+
+      <textarea id="meds" placeholder="Medications"></textarea>
+      <input type="text" id="allergies" placeholder="Allergies">
+
+      <button onclick="submitForm()">Submit</button>
+    </div>
+
+    <div id="result"></div>
+  `;
+}
+
+function checkbox(id,label){
+  return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
+}
+
+// ================= FLOW LOGIC =================
+
 function validateContact(){
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
 
   if(!name || !phone){
-    alert("Please enter your name and phone.");
+    alert("Enter name and phone");
     return;
   }
 
@@ -187,13 +175,9 @@ function validateContact(){
 function nextStep(step){
 
   if(step === 5){
-    const highRisk =
-      visionLoss.checked || pain.checked || light.checked ||
-      trauma.checked || chemical.checked || contactLensPain.checked;
-
-    if(highRisk){
-      document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-      result.innerHTML = "<div class='result red'>🚫 In-person care recommended</div>";
+    if(visionLoss.checked || pain.checked || light.checked || trauma.checked || chemical.checked || contactLensPain.checked){
+      document.getElementById("app").innerHTML =
+        "<div class='result red'>🚫 In-person care recommended</div>";
       return;
     }
   }
@@ -202,40 +186,62 @@ function nextStep(step){
   document.getElementById("step"+step).classList.add("active");
 }
 
+// ================= SUBMIT =================
+
 function submitForm(){
 
-  let providerButton = "";
+  const data = {
+    name: patient.name,
+    phone: patient.phone,
+    cc: cc.value,
+    meds: meds.value,
+    allergies: allergies.value
+  };
 
-  if(isProvider){
-    providerButton = `<button onclick="generateChart()">Generate Chart</button>`;
-  }
+  localStorage.setItem("patientData", JSON.stringify(data));
 
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-
-  result.innerHTML = `
+  document.getElementById("app").innerHTML = `
     <div class="result green">
       ✅ ${patient.name}, you are a candidate for virtual care.<br><br>
       <button onclick="joinNow()">Join Now</button>
-      ${providerButton}
     </div>`;
+}
+
+// ================= PROVIDER =================
+
+function loadProviderDashboard(){
+
+  const data = JSON.parse(localStorage.getItem("patientData"));
+
+  if(!data){
+    document.getElementById("app").innerHTML = "<p>No patient data yet</p>";
+    return;
+  }
+
+  document.getElementById("app").innerHTML = `
+    <h2>Provider Dashboard</h2>
+
+    <b>${data.name}</b><br>
+    ${data.phone}<br><br>
+
+    <button onclick="generateChart()">Generate Chart</button>
+  `;
 }
 
 function generateChart(){
 
-  const cc = document.getElementById("cc").value;
-  const meds = document.getElementById("meds").value;
-  const allergies = document.getElementById("allergies").value;
+  const data = JSON.parse(localStorage.getItem("patientData"));
 
-  document.body.innerHTML = `
+  document.getElementById("app").innerHTML = `
     <h2>Medical Record</h2>
 
-    <b>Name:</b> ${patient.name}<br>
-    <b>Phone:</b> ${patient.phone}<br><br>
+    <b>Name:</b> ${data.name}<br>
+    <b>Phone:</b> ${data.phone}<br><br>
 
-    <b>Chief Complaint:</b><br>${cc}<br><br>
+    <b>Chief Complaint:</b><br>${data.cc}<br><br>
 
-    <b>Medications:</b><br>${meds}<br><br>
-    <b>Allergies:</b><br>${allergies}<br><br>
+    <b>Medications:</b><br>${data.meds}<br><br>
+    <b>Allergies:</b><br>${data.allergies}<br><br>
 
     <b>Assessment:</b><br><textarea></textarea><br><br>
     <b>Plan:</b><br><textarea></textarea><br><br>
