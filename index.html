@@ -32,6 +32,22 @@ button { width:100%; padding:12px; margin-top:10px; }
   border-radius:6px;
   cursor:pointer;
 }
+
+/* SOAP styling */
+.soap-section {
+  margin-bottom:20px;
+}
+
+.soap-title {
+  font-weight:bold;
+  border-bottom:1px solid #000;
+  margin-bottom:6px;
+}
+
+.print-container {
+  max-width:700px;
+  margin:auto;
+}
 </style>
 </head>
 
@@ -235,35 +251,54 @@ function openChart(i){
 let p = JSON.parse(localStorage.getItem("patients"))[i];
 
 document.getElementById("app").innerHTML=`
+<div class="print-container">
+
 <h2>Medical Record</h2>
 
 <b>Name:</b> ${p.name}<br>
-<b>Phone:</b> ${p.phone}<br><br>
+<b>Phone:</b> ${p.phone}<br>
+<b>Date:</b> ${p.time}<br><br>
 
-<b>Chief Complaint:</b><br>${p.cc}<br><br>
+<div class="soap-section">
+<div class="soap-title">S: Subjective</div>
+<b>Chief Complaint:</b> ${p.cc}<br>
+<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
+<b>Medical History:</b> ${p.medHx.join(", ")}<br>
+<b>Other:</b> ${p.medHxOther || "None"}<br>
+<b>Family History:</b> ${p.famHx.join(", ")}<br>
+<b>Other:</b> ${p.famHxOther || "None"}<br>
+<b>Medications:</b> ${p.meds}<br>
+<b>Allergies:</b> ${p.allergies}
+</div>
 
-<b>Symptoms:</b><br>${p.symptoms.join(", ")}<br><br>
+<div class="soap-section">
+<div class="soap-title">O: Objective</div>
+Telehealth evaluation
+</div>
 
-<b>Medical History:</b><br>${p.medHx.join(", ")}<br>
-<b>Other:</b> ${p.medHxOther || "None"}<br><br>
+<div class="soap-section">
+<div class="soap-title">A: Assessment</div>
+<textarea></textarea>
+</div>
 
-<b>Family History:</b><br>${p.famHx.join(", ")}<br>
-<b>Other:</b> ${p.famHxOther || "None"}<br><br>
-
-<b>Medications:</b><br>${p.meds}<br><br>
-<b>Allergies:</b><br>${p.allergies}<br><br>
-
-<b>Assessment:</b><br><textarea></textarea><br>
-<b>Plan:</b><br><textarea></textarea><br>
-<b>Follow-Up:</b><br><textarea></textarea><br><br>
+<div class="soap-section">
+<div class="soap-title">P: Plan</div>
+<textarea></textarea><br>
+<b>Follow-Up:</b><br>
+<textarea></textarea>
+</div>
 
 <button onclick="window.print()">Print</button>
 <button onclick="removePatient(${i})">Remove Patient</button>
+
+</div>
 `;
 }
 
-// ✅ NEW FUNCTION (only addition)
+// ✅ confirmation added
 function removePatient(index){
+  if(!confirm("Are you sure you want to remove this patient?")) return;
+
   let patients = JSON.parse(localStorage.getItem("patients")) || [];
   patients.splice(index, 1);
   localStorage.setItem("patients", JSON.stringify(patients));
