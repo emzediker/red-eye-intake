@@ -341,18 +341,7 @@ window.location.href = "https://buy.stripe.com/28E4gz5sD92T5hPbaO2cg01";
 
 }
 
-paid = true;
 
-// disable button so user can't spam click
-document.querySelector("#step5 button").innerText = "Processing...";
-document.querySelector("#step5 button").disabled = true;
-
-// simulate processing delay
-setTimeout(() => {
-  submitForm();
-}, 800);
-
-}
 // ================= PROVIDER =================
 
 function loadProvider(){
