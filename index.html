@@ -390,10 +390,16 @@ function updateDoctor(){
 }
 
 function removePatient(index){
+
   if(!confirm("Are you sure you want to remove this patient?")) return;
-  let patients = JSON.parse(localStorage.getItem("patients")) || [];
-  patients.splice(index, 1);
-  localStorage.setItem("patients", JSON.stringify(patients));
+
+  const patient = window.livePatients[index];
+
+  fetch(SCRIPT_URL + "?delete=1&name=" + encodeURIComponent(patient.name), {
+    method: "GET",
+    mode: "no-cors"
+  });
+
   loadProvider();
 }
 
