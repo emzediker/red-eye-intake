@@ -69,7 +69,61 @@ if(isProvider){ loadProvider(); } else { loadPatient(); }
 function loadPatient(){
 document.getElementById("app").innerHTML=`
 
-<div class="step active" id="step1">
+<div class="step active" id="step0">
+
+<h3>Telehealth Consent</h3>
+
+<div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:15px;font-size:14px;">
+
+<b>Telehealth Consent & Safety Notice</b><br><br>
+
+<div class="check-row">
+<input type="checkbox" id="consent1">
+<span>I understand this is a telehealth screening and not a full in-person eye exam.</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent2">
+<span>I understand that serious conditions may not be fully diagnosed through telehealth.</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent3">
+<span>I agree to seek in-person care immediately if I experience pain, vision loss, or worsening symptoms.</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent4">
+<span>I consent to evaluation and treatment by a licensed optometrist via telehealth.</span>
+</div>
+
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent1">
+<span>I consent to a telehealth evaluation</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent2">
+<span>I understand this is not for emergencies</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent3">
+<span>I confirm I am physically located in Texas</span>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="consent4">
+<span>I agree to the privacy policy</span>
+</div>
+
+<button onclick="startIntake()">Continue</button>
+
+</div>
+
+<div class="step" id="step1">
 
 <div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
 This tool helps determine if your condition is appropriate for telehealth.
@@ -79,7 +133,7 @@ If you have pain, light sensitivity, or vision loss, you should be seen in perso
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
 
-<button onclick="validate()">Next</button>
+<button onclick="startIntake()">Next</button>
 </div>
 
 <div class="step" id="step2">
@@ -169,12 +223,26 @@ if(step===4){
 if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
 document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
 return;
-}}
+}
 
 document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
 }
 
+function startIntake(){
+
+if(
+!consent1.checked ||
+!consent2.checked ||
+!consent3.checked ||
+!consent4.checked
+){
+alert("You must agree to all items to continue.");
+return;
+}
+
+next(1);
+}
 // ================= SAVE =================
 
 function submitForm(){
