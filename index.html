@@ -223,18 +223,10 @@ function next(step){
 
 function startIntake(){
 
-const c1 = document.getElementById("consent1");
-const c2 = document.getElementById("consent2");
-const c3 = document.getElementById("consent3");
-const c4 = document.getElementById("consent4");
+const consent = document.getElementById("consentMain");
 
-if(
-!c1.checked ||
-!c2.checked ||
-!c3.checked ||
-!c4.checked
-){
-alert("You must agree to all items to continue.");
+if(!consent.checked){
+alert("You must agree to the Terms & Conditions to continue.");
 return;
 }
 
