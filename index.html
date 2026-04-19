@@ -74,7 +74,30 @@ let currentIndex = null;
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
 let paid = new URLSearchParams(window.location.search).get("paid") === "1";
-if(isProvider){ loadProvider(); } else { loadPatient(); }
+if(isProvider){
+  loadProvider();
+} else {
+
+  loadPatient();
+
+  // AFTER LOAD → check if returning from Stripe
+  if(paid){
+
+    const saved = JSON.parse(localStorage.getItem("pendingPatient"));
+
+    if(saved){
+      patient.name = saved.name;
+      patient.phone = saved.phone;
+
+      setTimeout(() => {
+        submitForm();
+        localStorage.removeItem("pendingPatient");
+      }, 500);
+    }
+
+  }
+
+}
 
 // ================= PATIENT =================
 
