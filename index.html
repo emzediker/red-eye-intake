@@ -73,7 +73,7 @@ let currentIndex = null;
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
-
+let paid = false;
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
 // ================= PATIENT =================
@@ -126,7 +126,6 @@ https://tob.texas.gov
 
 <button onclick="startIntake()">Continue</button>
 
-</div>
 </div>
 
 <div class="step" id="step1">
