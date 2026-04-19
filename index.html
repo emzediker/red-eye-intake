@@ -219,14 +219,15 @@ next(2);
 
 function next(step){
 
-if(step===4){
-if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
-document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
-return;
-}
+  if(step===4){
+    if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+      document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
+      return;
+    }
+  }
 
-document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-document.getElementById("step"+step).classList.add("active");
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.getElementById("step"+step).classList.add("active");
 }
 
 function startIntake(){
