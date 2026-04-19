@@ -220,7 +220,8 @@ alert("You must agree to all items to continue.");
 return;
 }
 
-next(1);
+document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+document.getElementById("step1").classList.add("active");
 }
 // ================= SAVE =================
 
