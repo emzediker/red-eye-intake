@@ -32,11 +32,6 @@ button { width:100%; padding:12px; margin-top:10px; }
   border-radius:6px;
   cursor:pointer;
 }
-
-.soap-section { margin-bottom:20px; }
-.soap-title { font-weight:bold; border-bottom:1px solid #000; margin-bottom:6px; }
-.print-container { max-width:700px; margin:auto; }
-.signature { margin-top:40px; }
 </style>
 </head>
 
@@ -51,17 +46,9 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxZbv6mpRMGe3xeIjJIniUOI-J2IMuc174h7JcPPy9bW2-SaJccMOR-QyffhzyI02OP/exec";
 
-const providers = {
-  "Emily Zediker, OD": { npi: "1790349074" },
-  "Sophia Brown, OD": { npi: "1750279949" }
-};
-
-let doctorName = "Emily Zediker, OD";
-let currentIndex = null;
-let patientCache = [];
-
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
-let patient={};
+let patient = {};
+let patientCache = [];
 
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
@@ -71,112 +58,54 @@ function loadPatient(){
 document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step1">
-<div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
-This tool helps determine if your condition is appropriate for telehealth.
-If you have pain, light sensitivity, or vision loss, you should be seen in person.
-</div>
-
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
-
 <button onclick="validate()">Next</button>
 </div>
 
 <div class="step" id="step2">
 <p><b>Symptoms</b></p>
-
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
-${cb("lid","Stye / lid bump")}
+${cb("lid","Stye")}
 ${cb("irritation","Irritation")}
-${cb("noneSymptoms","None of the above")}
-
 <button onclick="next(3)">Next</button>
 </div>
 
 <div class="step" id="step3">
-<p><b>Do you have any of the following symptoms?</b></p>
-
+<p><b>Red Flags</b></p>
 ${cb("vision","Vision loss")}
-${cb("pain","Severe pain")}
+${cb("pain","Pain")}
 ${cb("light","Light sensitivity")}
-${cb("trauma","Trauma")}
-${cb("chemical","Chemical exposure")}
-${cb("cl","Contact lens pain")}
-${cb("noneRF","None of the above")}
-
 <button onclick="next(4)">Next</button>
 </div>
 
 <div class="step" id="step4">
-
 <textarea id="cc" placeholder="Chief Complaint"></textarea>
-
-<p><b>Medical History</b></p>
-${medHx("mh_")}
-<input id="mh_other" placeholder="Other medical history">
-
-<p><b>Family History</b></p>
-${medHx("fh_")}
-<input id="fh_other" placeholder="Other family history">
-
-<textarea id="meds" placeholder="Medications"></textarea>
-<input id="allergies" placeholder="Allergies">
-
 <button onclick="submitForm()">Submit</button>
 </div>
-
-<div id="result"></div>
 `;
 }
 
 function cb(id,label){
-return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
-}
-
-function medHx(prefix){
-return `
-${cb(prefix+"diabetes","Diabetes")}
-${cb(prefix+"htn","Hypertension")}
-${cb(prefix+"chol","High cholesterol")}
-${cb(prefix+"cancer","Cancer")}
-${cb(prefix+"autoimmune","Autoimmune")}
-${cb(prefix+"thyroid","Thyroid")}
-${cb(prefix+"asthma","Asthma")}
-${cb(prefix+"heart","Heart disease")}
-${cb(prefix+"none","None")}
-`;
+return `<div><input type="checkbox" id="${id}"> ${label}</div>`;
 }
 
 // ================= FLOW =================
 
 function validate(){
-const name=document.getElementById("name").value;
-const phone=document.getElementById("phone").value;
-
-if(!name||!phone){alert("Enter info");return;}
-
-patient.name=name;
-patient.phone=phone;
-
+patient.name = name.value;
+patient.phone = phone.value;
 next(2);
 }
 
 function next(step){
-
-const redFlags = ["vision","pain","light","trauma","chemical","cl"];
-
-if(step===4 && redFlags.some(id => document.getElementById(id).checked)){
-document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
-return;
+document.querySelectorAll(".step").forEach(s=>s.style.display="none");
+document.getElementById("step"+step).style.display="block";
 }
 
-document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-document.getElementById("step"+step).classList.add("active");
-}
-
-// ================= SAVE =================
+// ================= SAVE (GET METHOD) =================
 
 function submitForm(){
 
@@ -184,66 +113,37 @@ let symptoms=[];
 if(redness.checked) symptoms.push("Red eye");
 if(itching.checked) symptoms.push("Itching");
 if(discharge.checked) symptoms.push("Discharge");
-if(lid.checked) symptoms.push("Stye");
-if(irritation.checked) symptoms.push("Irritation");
 
-function collect(prefix){
-let arr=[];
-["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
-if(document.getElementById(prefix+x).checked){arr.push(x);}
-});
-return arr;
-}
-
-const newPatient={
-name:patient.name,
-phone:patient.phone,
-cc:cc.value,
-symptoms:symptoms,
-medHx:collect("mh_"),
-medHxOther:mh_other.value,
-famHx:collect("fh_"),
-famHxOther:fh_other.value,
-meds:meds.value,
-allergies:allergies.value,
-time:new Date().toLocaleString()
-};
-
-// ✅ WORKING POST (CORS-safe)
-fetch(API_URL, {
-method: "POST",
-mode: "no-cors",
-body: JSON.stringify(newPatient)
+const params = new URLSearchParams({
+  name: patient.name,
+  phone: patient.phone,
+  cc: cc.value,
+  symptoms: symptoms.join(", "),
+  time: new Date().toLocaleString()
 });
 
-// show success immediately
+fetch(API_URL + "?" + params.toString());
+
 document.getElementById("app").innerHTML=`
 <div class="result green">
-✅ You may proceed<br><br>
-<button onclick="join()">Join Visit</button>
+✅ Submitted successfully
 </div>`;
 }
 
 // ================= PROVIDER =================
 
 function loadProvider(){
-
 fetch(API_URL)
 .then(res => res.json())
-.then(patients => {
+.then(data => {
 
-patientCache = patients;
+patientCache = data;
 
-if(patients.length===0){
-document.getElementById("app").innerHTML="No patients yet";
-return;
-}
+let html="<h2>Patients</h2>";
 
-let html="<h2>Patient Queue</h2>";
-
-patients.forEach((p,i)=>{
+data.forEach((p,i)=>{
 html+=`
-<div class="card" onclick="openChart(${i})">
+<div class="card">
 <b>${p.name}</b><br>
 ${p.phone}<br>
 ${p.time}
@@ -251,45 +151,7 @@ ${p.time}
 });
 
 document.getElementById("app").innerHTML=html;
-
 });
-}
-
-function openChart(i){
-
-currentIndex = i;
-let p = patientCache[i];
-
-document.getElementById("app").innerHTML=`
-
-<div class="print-container">
-
-<h2>Medical Record</h2>
-
-<b>Name:</b> ${p.name}<br>
-<b>Phone:</b> ${p.phone}<br>
-<b>Date:</b> ${p.time}<br><br>
-
-<div class="soap-section">
-<div class="soap-title">S: Subjective</div>
-<b>Chief Complaint:</b> ${p.cc}<br>
-<b>Symptoms:</b> ${p.symptoms}<br>
-<b>Medical History:</b> ${p.medHx}<br>
-<b>Other:</b> ${p.medHxOther || "None"}<br>
-<b>Family History:</b> ${p.famHx}<br>
-<b>Other:</b> ${p.famHxOther || "None"}<br>
-<b>Medications:</b> ${p.meds}<br>
-<b>Allergies:</b> ${p.allergies}
-</div>
-
-<button onclick="window.print()">Print</button>
-
-</div>
-`;
-}
-
-function join(){
-window.location.href="https://doxy.me/YOURROOM";
 }
 
 </script>
