@@ -73,7 +73,7 @@ let currentIndex = null;
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
-let paid = false;
+let paid = new URLSearchParams(window.location.search).get("paid") === "1";
 if(isProvider){ loadProvider(); } else { loadPatient(); }
 
 // ================= PATIENT =================
