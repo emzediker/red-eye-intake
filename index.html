@@ -333,8 +333,13 @@ document.getElementById("app").innerHTML=`
 <button onclick="join()">Join Visit</button>
 </div>`;
 }
+function processPayment(){
 
-  function processPayment(){
+saveBeforePayment();
+
+window.location.href = "https://buy.stripe.com/28E4gz5sD92T5hPbaO2cg01";
+
+}
 
 paid = true;
 
