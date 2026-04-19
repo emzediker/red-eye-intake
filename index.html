@@ -329,6 +329,40 @@ document.getElementById("app").innerHTML=`
 <button onclick="join()">Join Visit</button>
 </div>`;
 }
+
+  function saveBeforePayment(){
+
+let symptoms=[];
+if(redness.checked) symptoms.push("Red eye");
+if(itching.checked) symptoms.push("Itching");
+if(discharge.checked) symptoms.push("Discharge");
+if(lid.checked) symptoms.push("Stye");
+if(irritation.checked) symptoms.push("Irritation");
+
+function collect(prefix){
+let arr=[];
+["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
+if(document.getElementById(prefix+x).checked){arr.push(x);}
+});
+return arr;
+}
+
+const tempData={
+name:patient.name,
+phone:patient.phone,
+cc:cc.value,
+symptoms:symptoms,
+medHx:collect("mh_"),
+medHxOther:mh_other.value,
+famHx:collect("fh_"),
+famHxOther:fh_other.value,
+meds:meds.value,
+allergies:allergies.value
+};
+
+localStorage.setItem("pendingPatient", JSON.stringify(tempData));
+
+}
 function processPayment(){
 
 saveBeforePayment();
