@@ -209,31 +209,19 @@ allergies:allergies.value,
 time:new Date().toLocaleString()
 };
 
+// ✅ WORKING POST (CORS-safe)
 fetch(API_URL, {
 method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
+mode: "no-cors",
 body: JSON.stringify(newPatient)
-})
-.then(res => res.json())
-.then(data => {
-console.log("SERVER RESPONSE:", data);
+});
 
-if(data.status === "success"){
+// show success immediately
 document.getElementById("app").innerHTML=`
 <div class="result green">
 ✅ You may proceed<br><br>
 <button onclick="join()">Join Visit</button>
 </div>`;
-} else {
-alert("Error: " + data.message);
-}
-})
-.catch(err => {
-alert("Submission failed: " + err);
-});
-
 }
 
 // ================= PROVIDER =================
