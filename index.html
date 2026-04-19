@@ -49,6 +49,9 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
+// 🔥 YOUR GOOGLE SCRIPT
+const API_URL = "https://script.google.com/macros/s/AKfycbxZbv6mpRMGe3xeIjJIniUOI-J2IMuc174h7JcPPy9bW2-SaJccMOR-QyffhzyI02OP/exec";
+
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
   "Sophia Brown, OD": { npi: "1750279949" }
@@ -56,6 +59,7 @@ const providers = {
 
 let doctorName = "Emily Zediker, OD";
 let currentIndex = null;
+let patientCache = [];
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
@@ -68,7 +72,6 @@ function loadPatient(){
 document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step1">
-
 <div style="background:#f5f5f5;padding:10px;border-radius:6px;margin-bottom:15px;">
 This tool helps determine if your condition is appropriate for telehealth.
 If you have pain, light sensitivity, or vision loss, you should be seen in person.
@@ -88,7 +91,6 @@ ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
 ${cb("lid","Stye / lid bump")}
 ${cb("irritation","Irritation")}
-${cb("noneSymptoms","None of the above")}
 
 <button onclick="next(3)">Next</button>
 </div>
@@ -102,7 +104,6 @@ ${cb("light","Light sensitivity")}
 ${cb("trauma","Trauma")}
 ${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
-${cb("noneRF","None of the above")}
 
 <button onclick="next(4)">Next</button>
 </div>
@@ -143,7 +144,6 @@ ${cb(prefix+"autoimmune","Autoimmune")}
 ${cb(prefix+"thyroid","Thyroid")}
 ${cb(prefix+"asthma","Asthma")}
 ${cb(prefix+"heart","Heart disease")}
-${cb(prefix+"none","None")}
 `;
 }
 
@@ -163,11 +163,12 @@ next(2);
 
 function next(step){
 
-if(step===4){
-if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+const redFlags = ["vision","pain","light","trauma","chemical","cl"];
+
+if(step===4 && redFlags.some(id => document.getElementById(id).checked)){
 document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
 return;
-}}
+}
 
 document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
 document.getElementById("step"+step).classList.add("active");
@@ -206,10 +207,12 @@ allergies:allergies.value,
 time:new Date().toLocaleString()
 };
 
-let all = JSON.parse(localStorage.getItem("patients")) || [];
-all.push(newPatient);
-
-localStorage.setItem("patients", JSON.stringify(all));
+// 🔥 SEND TO GOOGLE SHEETS
+fetch(API_URL, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify(newPatient)
+});
 
 document.getElementById("app").innerHTML=`
 <div class="result green">
@@ -222,7 +225,10 @@ document.getElementById("app").innerHTML=`
 
 function loadProvider(){
 
-let patients = JSON.parse(localStorage.getItem("patients")) || [];
+fetch(API_URL)
+.then(res => res.json())
+.then(patients => {
+patientCache = patients;
 
 if(patients.length===0){
 document.getElementById("app").innerHTML="No patients yet";
@@ -241,17 +247,13 @@ ${p.time}
 });
 
 document.getElementById("app").innerHTML=html;
+});
 }
 
 function openChart(i){
 
 currentIndex = i;
-
-let p = JSON.parse(localStorage.getItem("patients"))[i];
-
-let cleanName = p.name.replace(/\s+/g, "_");
-let date = new Date().toISOString().split("T")[0];
-document.title = cleanName + "_" + date;
+let p = patientCache[i];
 
 let doctorSelector = `
 <label><b>Select Provider:</b></label>
@@ -276,10 +278,10 @@ ${doctorSelector}
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
 <b>Chief Complaint:</b> ${p.cc}<br>
-<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
-<b>Medical History:</b> ${p.medHx.join(", ")}<br>
+<b>Symptoms:</b> ${p.symptoms}<br>
+<b>Medical History:</b> ${p.medHx}<br>
 <b>Other:</b> ${p.medHxOther || "None"}<br>
-<b>Family History:</b> ${p.famHx.join(", ")}<br>
+<b>Family History:</b> ${p.famHx}<br>
 <b>Other:</b> ${p.famHxOther || "None"}<br>
 <b>Medications:</b> ${p.meds}<br>
 <b>Allergies:</b> ${p.allergies}
@@ -304,10 +306,7 @@ Telehealth evaluation
   <option>H04.12 – Dry eye</option>
   <option>H11.3 – Subconjunctival hemorrhage</option>
   <option>H57.1 – Ocular pain</option>
-  <option value="other">Other</option>
 </select>
-
-<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
 
 <textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
 </div>
@@ -327,45 +326,14 @@ NPI: ${providers[doctorName].npi}
 </div>
 
 <button onclick="window.print()">Print / Save PDF</button>
-<button onclick="removePatient(${i})">Remove Patient</button>
 
 </div>
 `;
 }
 
-// ICD auto-fill
-document.addEventListener("change", function(e){
-
-  if(e.target && e.target.id === "icdSelect"){
-
-    const custom = document.getElementById("customICD");
-    const box = document.getElementById("assessmentBox");
-
-    if(e.target.value === "other"){
-      custom.style.display = "block";
-      return;
-    } else {
-      custom.style.display = "none";
-    }
-
-    if(e.target.value && box){
-      box.value = e.target.value;
-    }
-  }
-
-});
-
 function updateDoctor(){
-  doctorName = document.getElementById("doctorSelect").value;
-  openChart(currentIndex);
-}
-
-function removePatient(index){
-  if(!confirm("Are you sure you want to remove this patient?")) return;
-  let patients = JSON.parse(localStorage.getItem("patients")) || [];
-  patients.splice(index, 1);
-  localStorage.setItem("patients", JSON.stringify(patients));
-  loadProvider();
+doctorName = document.getElementById("doctorSelect").value;
+openChart(currentIndex);
 }
 
 function join(){
