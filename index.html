@@ -209,24 +209,31 @@ allergies:allergies.value,
 time:new Date().toLocaleString()
 };
 
-// 🔥 FIXED FETCH (THIS WAS THE ISSUE)
 fetch(API_URL, {
 method: "POST",
-mode: "no-cors",
 headers: {
 "Content-Type": "application/json"
 },
 body: JSON.stringify(newPatient)
-});
+})
+.then(res => res.json())
+.then(data => {
+console.log("SERVER RESPONSE:", data);
 
-// slight delay to ensure send completes
-setTimeout(() => {
+if(data.status === "success"){
 document.getElementById("app").innerHTML=`
 <div class="result green">
 ✅ You may proceed<br><br>
 <button onclick="join()">Join Visit</button>
 </div>`;
-}, 500);
+} else {
+alert("Error: " + data.message);
+}
+})
+.catch(err => {
+alert("Submission failed: " + err);
+});
+
 }
 
 // ================= PROVIDER =================
@@ -236,6 +243,7 @@ function loadProvider(){
 fetch(API_URL)
 .then(res => res.json())
 .then(patients => {
+
 patientCache = patients;
 
 if(patients.length===0){
@@ -255,6 +263,7 @@ ${p.time}
 });
 
 document.getElementById("app").innerHTML=html;
+
 });
 }
 
@@ -263,17 +272,7 @@ function openChart(i){
 currentIndex = i;
 let p = patientCache[i];
 
-let doctorSelector = `
-<label><b>Select Provider:</b></label>
-<select id="doctorSelect" onchange="updateDoctor()">
-<option value="Emily Zediker, OD">Emily Zediker, OD</option>
-<option value="Sophia Brown, OD">Sophia Brown, OD</option>
-</select><br><br>
-`;
-
 document.getElementById("app").innerHTML=`
-
-${doctorSelector}
 
 <div class="print-container">
 
@@ -295,53 +294,10 @@ ${doctorSelector}
 <b>Allergies:</b> ${p.allergies}
 </div>
 
-<div class="soap-section">
-<div class="soap-title">O: Objective</div>
-Telehealth evaluation
-</div>
-
-<div class="soap-section">
-<div class="soap-title">A: Assessment</div>
-
-<select id="icdSelect">
-<option value="">-- Select ICD-10 --</option>
-<option>H10.3 – Acute conjunctivitis</option>
-<option>H10.45 – Chronic allergic conjunctivitis</option>
-<option>H01.00 – Blepharitis</option>
-<option>H00.019 – Hordeolum externum</option>
-<option>H00.029 – Hordeolum internum</option>
-<option>H00.19 – Chalazion</option>
-<option>H04.12 – Dry eye</option>
-<option>H11.3 – Subconjunctival hemorrhage</option>
-<option>H57.1 – Ocular pain</option>
-</select>
-
-<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
-</div>
-
-<div class="soap-section">
-<div class="soap-title">P: Plan</div>
-<textarea></textarea><br>
-<b>Follow-Up:</b><br>
-<textarea></textarea>
-</div>
-
-<div class="signature">
-<br><br>
-_________________________<br>
-${doctorName}<br>
-NPI: ${providers[doctorName].npi}
-</div>
-
-<button onclick="window.print()">Print / Save PDF</button>
+<button onclick="window.print()">Print</button>
 
 </div>
 `;
-}
-
-function updateDoctor(){
-doctorName = document.getElementById("doctorSelect").value;
-openChart(currentIndex);
 }
 
 function join(){
