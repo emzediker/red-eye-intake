@@ -49,6 +49,8 @@ button { width:100%; padding:12px; margin-top:10px; }
 
 <script>
 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZbv6mpRMGe3xeIjJIniUOI-J2IMuc174h7JcPPy9bW2-SaJccMOR-QyffhzyI02OP/exec";
+  
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
   "Sophia Brown, OD": { npi: "1750279949" }
@@ -212,8 +214,11 @@ all.push(newPatient);
 localStorage.setItem("patients", JSON.stringify(all));
 
 // ✅ SEND TO GOOGLE SHEETS
-fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
+fetch(SCRIPT_URL, {
   method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
   body: JSON.stringify({
     name: patient.name,
     phone: patient.phone,
@@ -237,32 +242,41 @@ document.getElementById("app").innerHTML=`
 
 function loadProvider(){
 
-let patients = JSON.parse(localStorage.getItem("patients")) || [];
+fetch(SCRIPT_URL)
+  .then(res => res.json())
+  .then(patients => {
 
-if(patients.length===0){
-document.getElementById("app").innerHTML="No patients yet";
-return;
-}
+    if(!patients || patients.length === 0){
+      document.getElementById("app").innerHTML="No patients yet";
+      return;
+    }
 
-let html="<h2>Patient Queue</h2>";
+    window.livePatients = patients.reverse();
 
-patients.forEach((p,i)=>{
-html+=`
-<div class="card" onclick="openChart(${i})">
-<b>${p.name}</b><br>
-${p.phone}<br>
-${p.time}
-</div>`;
-});
+    let html="<h2>Patient Queue</h2>";
 
-document.getElementById("app").innerHTML=html;
+    window.livePatients.forEach((p,i)=>{
+      html+=`
+      <div class="card" onclick="openChart(${i})">
+      <b>${p.name}</b><br>
+      ${p.phone}<br>
+      ${p.time}
+      </div>`;
+    });
+
+    document.getElementById("app").innerHTML=html;
+
+  })
+  .catch(()=>{
+    document.getElementById("app").innerHTML="Error loading patients";
+  });
 }
 
 function openChart(i){
 
 currentIndex = i;
 
-let p = JSON.parse(localStorage.getItem("patients"))[i];
+let p = window.livePatients[i];
 
 let cleanName = p.name.replace(/\s+/g, "_");
 let date = new Date().toISOString().split("T")[0];
@@ -291,10 +305,10 @@ ${doctorSelector}
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
 <b>Chief Complaint:</b> ${p.cc}<br>
-<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
-<b>Medical History:</b> ${p.medHx.join(", ")}<br>
+<b>Symptoms:</b> ${p.symptoms}<br>
+<b>Medical History:</b> ${p.medHx}<br>
 <b>Other:</b> ${p.medHxOther || "None"}<br>
-<b>Family History:</b> ${p.famHx.join(", ")}<br>
+<b>Family History:</b> ${p.famHx}<br>
 <b>Other:</b> ${p.famHxOther || "None"}<br>
 <b>Medications:</b> ${p.meds}<br>
 <b>Allergies:</b> ${p.allergies}
