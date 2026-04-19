@@ -1,3 +1,5 @@
+This html looks shortened from ghe original areyou sure you arent cutting stuff?
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -48,8 +50,6 @@ button { width:100%; padding:12px; margin-top:10px; }
 <div id="app"></div>
 
 <script>
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZbv6mpRMGe3xeIjJIniUOI-J2IMuc174h7JcPPy9bW2-SaJccMOR-QyffhzyI02OP/exec";
 
 const providers = {
   "Emily Zediker, OD": { npi: "1790349074" },
@@ -194,11 +194,28 @@ if(document.getElementById(prefix+x).checked){arr.push(x);}
 return arr;
 }
 
-fetch(SCRIPT_URL, {
+const newPatient={
+name:patient.name,
+phone:patient.phone,
+cc:cc.value,
+symptoms:symptoms,
+medHx:collect("mh_"),
+medHxOther:mh_other.value,
+famHx:collect("fh_"),
+famHxOther:fh_other.value,
+meds:meds.value,
+allergies:allergies.value,
+time:new Date().toLocaleString()
+};
+
+// KEEP LOCAL STORAGE
+let all = JSON.parse(localStorage.getItem("patients")) || [];
+all.push(newPatient);
+localStorage.setItem("patients", JSON.stringify(all));
+
+// ✅ SEND TO GOOGLE SHEETS
+fetch("https://script.google.com/macros/s/AKfycbyLSP8Zd8t62-q7iX9mFAJR5LpOsnx4V49YqJGnouRcNlVSbAIjAB5JkJthoFbU8c2k/exec", {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
   body: JSON.stringify({
     name: patient.name,
     phone: patient.phone,
@@ -222,38 +239,32 @@ document.getElementById("app").innerHTML=`
 
 function loadProvider(){
 
-fetch(SCRIPT_URL)
-  .then(res => res.json())
-  .then(patients => {
+let patients = JSON.parse(localStorage.getItem("patients")) || [];
 
-    if(!patients || patients.length === 0){
-      document.getElementById("app").innerHTML="No patients yet";
-      return;
-    }
+if(patients.length===0){
+document.getElementById("app").innerHTML="No patients yet";
+return;
+}
 
-    window.livePatients = patients.reverse();
+let html="<h2>Patient Queue</h2>";
 
-    let html="<h2>Patient Queue</h2>";
+patients.forEach((p,i)=>{
+html+=`
+<div class="card" onclick="openChart(${i})">
+<b>${p.name}</b><br>
+${p.phone}<br>
+${p.time}
+</div>`;
+});
 
-    window.livePatients.forEach((p,i)=>{
-      html+=`
-      <div class="card" onclick="openChart(${i})">
-      <b>${p.name}</b><br>
-      ${p.phone}<br>
-      ${p.time}
-      </div>`;
-    });
-
-    document.getElementById("app").innerHTML=html;
-
-  });
+document.getElementById("app").innerHTML=html;
 }
 
 function openChart(i){
 
 currentIndex = i;
 
-let p = window.livePatients[i];
+let p = JSON.parse(localStorage.getItem("patients"))[i];
 
 let cleanName = p.name.replace(/\s+/g, "_");
 let date = new Date().toISOString().split("T")[0];
@@ -282,23 +293,95 @@ ${doctorSelector}
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
 <b>Chief Complaint:</b> ${p.cc}<br>
-<b>Symptoms:</b> ${p.symptoms}<br>
-<b>Medical History:</b> ${p.medHx}<br>
-<b>Family History:</b> ${p.famHx}<br>
+<b>Symptoms:</b> ${p.symptoms.join(", ")}<br>
+<b>Medical History:</b> ${p.medHx.join(", ")}<br>
+<b>Other:</b> ${p.medHxOther || "None"}<br>
+<b>Family History:</b> ${p.famHx.join(", ")}<br>
+<b>Other:</b> ${p.famHxOther || "None"}<br>
 <b>Medications:</b> ${p.meds}<br>
 <b>Allergies:</b> ${p.allergies}
 </div>
 
-<button onclick="window.print()">Print</button>
-<button onclick="loadProvider()">Back</button>
+<div class="soap-section">
+<div class="soap-title">O: Objective</div>
+Telehealth evaluation
+</div>
+
+<div class="soap-section">
+<div class="soap-title">A: Assessment</div>
+
+<select id="icdSelect">
+  <option value="">-- Select ICD-10 --</option>
+  <option>H10.3 – Acute conjunctivitis</option>
+  <option>H10.45 – Chronic allergic conjunctivitis</option>
+  <option>H01.00 – Blepharitis</option>
+  <option>H00.019 – Hordeolum externum</option>
+  <option>H00.029 – Hordeolum internum</option>
+  <option>H00.19 – Chalazion</option>
+  <option>H04.12 – Dry eye</option>
+  <option>H11.3 – Subconjunctival hemorrhage</option>
+  <option>H57.1 – Ocular pain</option>
+  <option value="other">Other</option>
+</select>
+
+<input id="customICD" placeholder="Enter ICD-10" style="display:none;">
+
+<textarea id="assessmentBox" placeholder="Assessment notes"></textarea>
+</div>
+
+<div class="soap-section">
+<div class="soap-title">P: Plan</div>
+<textarea></textarea><br>
+<b>Follow-Up:</b><br>
+<textarea></textarea>
+</div>
+
+<div class="signature">
+<br><br>
+_________________________<br>
+${doctorName}<br>
+NPI: ${providers[doctorName].npi}
+</div>
+
+<button onclick="window.print()">Print / Save PDF</button>
+<button onclick="removePatient(${i})">Remove Patient</button>
 
 </div>
 `;
 }
 
+document.addEventListener("change", function(e){
+
+  if(e.target && e.target.id === "icdSelect"){
+
+    const custom = document.getElementById("customICD");
+    const box = document.getElementById("assessmentBox");
+
+    if(e.target.value === "other"){
+      custom.style.display = "block";
+      return;
+    } else {
+      custom.style.display = "none";
+    }
+
+    if(e.target.value && box){
+      box.value = e.target.value;
+    }
+  }
+
+});
+
 function updateDoctor(){
-doctorName = document.getElementById("doctorSelect").value;
-openChart(currentIndex);
+  doctorName = document.getElementById("doctorSelect").value;
+  openChart(currentIndex);
+}
+
+function removePatient(index){
+  if(!confirm("Are you sure you want to remove this patient?")) return;
+  let patients = JSON.parse(localStorage.getItem("patients")) || [];
+  patients.splice(index, 1);
+  localStorage.setItem("patients", JSON.stringify(patients));
+  loadProvider();
 }
 
 function join(){
