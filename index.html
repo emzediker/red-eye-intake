@@ -267,6 +267,13 @@ document.getElementById("step1").classList.add("active");
 
 function submitForm(){
 
+if(!paid){
+alert("Payment required");
+return;
+}
+
+let symptoms=[];
+
 let symptoms=[];
 if(redness.checked) symptoms.push("Red eye");
 if(itching.checked) symptoms.push("Itching");
