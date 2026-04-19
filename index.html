@@ -87,26 +87,41 @@ document.getElementById("app").innerHTML=`
 
 <div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:15px;font-size:14px;">
 
-<b>Telehealth Consent & Safety Notice</b><br><br>
+<b>Telehealth Terms & Conditions</b><br><br>
 
-<div class="check-row">
-<input type="checkbox" id="consent1">
-<span>I consent to a telehealth evaluation</span>
+<div style="max-height:200px;overflow-y:auto;">
+
+This is a telehealth screening service and not a full in-person eye exam.
+
+You confirm you are physically located in Texas.
+
+This service is not for emergencies. If you have severe pain, vision loss, or trauma, seek immediate care.
+
+A licensed optometrist will review your information, but some conditions cannot be fully diagnosed via telehealth.
+
+The cost of this visit is $25. If your condition requires in-person care and no treatment is provided, you may be eligible for a refund.
+
+No guarantees are made regarding diagnosis or outcomes.
+
+Your information will be handled בהתאם applicable privacy standards. Electronic communication carries some risk.
+
+You consent to evaluation and treatment via telehealth.
+
+<br><br>
+
+If you have a complaint, contact:
+
+Texas Optometry Board  
+333 Guadalupe St, Suite 2-420  
+Austin, TX 78701  
+(512) 305-8500  
+https://tob.texas.gov
+
 </div>
 
 <div class="check-row">
-<input type="checkbox" id="consent2">
-<span>I understand this is not for emergencies</span>
-</div>
-
-<div class="check-row">
-<input type="checkbox" id="consent3">
-<span>I confirm I am physically located in Texas</span>
-</div>
-
-<div class="check-row">
-<input type="checkbox" id="consent4">
-<span>I agree to the privacy policy</span>
+<input type="checkbox" id="consentMain">
+<span>I agree to the Terms & Conditions</span>
 </div>
 
 <button onclick="startIntake()">Continue</button>
