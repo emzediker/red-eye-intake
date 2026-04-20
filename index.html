@@ -386,6 +386,15 @@ allergies:allergies.value
 localStorage.setItem("pendingPatient", JSON.stringify(tempData));
 
 }
+
+function goToSchedule(){
+
+  saveBeforePayment();
+
+  window.location.href = "https://calendly.com/emzediker/30min";
+
+}
+  
 function processPayment(){
 
 saveBeforePayment();
