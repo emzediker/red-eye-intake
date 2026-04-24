@@ -173,12 +173,7 @@ If you have pain, light sensitivity, or vision loss, you should be seen in perso
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
 
-<button onclick="validate()">Next</button>
-</div>
-
-<div class="step" id="step2">
 <p><b>Symptoms</b></p>
-
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
@@ -186,21 +181,17 @@ ${cb("lid","Stye / lid bump")}
 ${cb("irritation","Irritation")}
 ${cb("noneSymptoms","None of the above")}
 
-<button onclick="next(3)">Next</button>
-</div>
-
-<div class="step" id="step3">
-<p><b>Do you have any of the following symptoms?</b></p>
-
+<p><b>Do you have any of the following?</b></p>
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
-${cb("light","Light sensitivity")}
+${cb("light","Severe light sensitivity")}
 ${cb("trauma","Trauma")}
 ${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
 ${cb("noneRF","None of the above")}
 
-<button onclick="next(4)">Next</button>
+<button onclick="validate()">Next</button>
+
 </div>
 
 <div class="step" id="step4">
