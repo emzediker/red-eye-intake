@@ -234,7 +234,7 @@ Your provider will join you shortly.
 
 <br>
 
-<button onclick="submitForm()">Save & Continue</button>
+<button onclick="saveBeforePayment()">Save & Continue</button>
 
 <br><br>
 
@@ -378,10 +378,9 @@ fetch(SCRIPT_URL, {
   })
 });
 
-document.getElementById("app").innerHTML=`
+document.getElementById("result").innerHTML=`
 <div class="result green">
-✅ You may proceed<br><br>
-<button onclick="join()">Join Visit</button>
+✅ Information saved. Please complete scheduling and payment.
 </div>`;
 }
 
