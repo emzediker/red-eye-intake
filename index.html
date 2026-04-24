@@ -173,7 +173,12 @@ If you have pain, light sensitivity, or vision loss, you should be seen in perso
 <input id="name" placeholder="Full Name">
 <input id="phone" placeholder="Phone Number">
 
+<button onclick="validate()">Next</button>
+</div>
+
+<div class="step" id="step2">
 <p><b>Symptoms</b></p>
+
 ${cb("redness","Red eye")}
 ${cb("itching","Itching")}
 ${cb("discharge","Discharge")}
@@ -181,17 +186,21 @@ ${cb("lid","Stye / lid bump")}
 ${cb("irritation","Irritation")}
 ${cb("noneSymptoms","None of the above")}
 
-<p><b>Do you have any of the following?</b></p>
+<button onclick="next(3)">Next</button>
+</div>
+
+<div class="step" id="step3">
+<p><b>Do you have any of the following symptoms?</b></p>
+
 ${cb("vision","Vision loss")}
 ${cb("pain","Severe pain")}
-${cb("light","Severe light sensitivity")}
+${cb("light","Light sensitivity")}
 ${cb("trauma","Trauma")}
 ${cb("chemical","Chemical exposure")}
 ${cb("cl","Contact lens pain")}
 ${cb("noneRF","None of the above")}
 
-<button onclick="validate()">Next</button>
-
+<button onclick="next(4)">Next</button>
 </div>
 
 <div class="step" id="step4">
@@ -209,7 +218,7 @@ ${medHx("fh_")}
 <textarea id="meds" placeholder="Medications"></textarea>
 <input id="allergies" placeholder="Allergies">
 
-<button onclick="next(5)">Continue to Scheduling</button>
+<button onclick="next(5)">Continue to Payment</button>
 </div>
 
 <div class="step" id="step5">
@@ -233,11 +242,6 @@ Your provider will join you shortly.
 </div>
 
 <br>
-
-<button onclick="saveBeforePayment()">Save & Continue</button>
-
-<br><br>
-
 
 <!-- Calendly inline widget begin -->
 <div class="calendly-inline-widget" 
@@ -271,37 +275,25 @@ ${cb(prefix+"none","None")}
 // ================= FLOW =================
 
 function validate(){
-const name = document.getElementById("name").value;
-const phone = document.getElementById("phone").value;
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
 
-if(!name || !phone){
-  alert("Enter info");
-  return;
-}
+if(!name||!phone){alert("Enter info");return;}
 
-patient.name = name;
-patient.phone = phone;
+patient.name=name;
+patient.phone=phone;
 
-// 🚨 RED FLAG CHECK
-if(
-  document.getElementById("vision").checked ||
-  document.getElementById("pain").checked ||
-  document.getElementById("light").checked ||
-  document.getElementById("trauma").checked ||
-  document.getElementById("chemical").checked ||
-  document.getElementById("cl").checked
-){
-  document.getElementById("app").innerHTML =
-    "<div class='result red'>🚫 In-person care recommended</div>";
-  return;
-}
-
-next(4);
+next(2);
 }
 
 function next(step){
 
-  
+  if(step===4){
+    if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+      document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
+      return;
+    }
+  }
 
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
   document.getElementById("step"+step).classList.add("active");
@@ -322,8 +314,6 @@ document.getElementById("step1").classList.add("active");
 // ================= SAVE =================
 
 function submitForm(){
-
-
 
 let symptoms=[];
 if(redness.checked) symptoms.push("Red eye");
@@ -378,9 +368,10 @@ fetch(SCRIPT_URL, {
   })
 });
 
-document.getElementById("result").innerHTML=`
+document.getElementById("app").innerHTML=`
 <div class="result green">
-✅ Information saved. Please complete scheduling and payment.
+✅ You may proceed<br><br>
+<button onclick="join()">Join Visit</button>
 </div>`;
 }
 
