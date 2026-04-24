@@ -274,17 +274,28 @@ if(!name||!phone){alert("Enter info");return;}
 patient.name=name;
 patient.phone=phone;
 
-next(2);
+function validate(){
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
+
+if(!name||!phone){alert("Enter info");return;}
+
+patient.name=name;
+patient.phone=phone;
+
+// 🚨 RED FLAG CHECK MOVED HERE
+if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
+  document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
+  return;
+}
+
+next(4);
+}
 }
 
 function next(step){
 
-  if(step===4){
-    if(vision.checked||pain.checked||light.checked||trauma.checked||chemical.checked||cl.checked){
-      document.getElementById("app").innerHTML="<div class='result red'>🚫 In-person care recommended</div>";
-      return;
-    }
-  }
+  
 
   document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
   document.getElementById("step"+step).classList.add("active");
