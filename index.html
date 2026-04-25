@@ -452,7 +452,7 @@ famHx:collect("fh_"),
 famHxOther:fh_other.value,
 meds:meds.value,
 allergies:allergies.value,
-time:new Date().toLocaleString()
+time:new Date().toLocaleString(),
 selectedTime: patient.selectedTime || "",
 };
 
@@ -476,7 +476,7 @@ fetch(SCRIPT_URL, {
     medHx: collect("mh_").join(", "),
     famHx: collect("fh_").join(", "),
     meds: meds.value,
-    allergies: allergies.value
+    allergies: allergies.value,
     selectedTime: patient.selectedTime || "",
   })
 });
