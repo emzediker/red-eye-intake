@@ -88,6 +88,7 @@ if(isProvider){
     if(saved){
       patient.name = saved.name;
       patient.phone = saved.phone;
+      patient.selectedTime = saved.selectedTime || "";
 
       setTimeout(() => {
         submitForm();
