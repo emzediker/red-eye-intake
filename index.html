@@ -442,18 +442,18 @@ return arr;
 }
 
 const newPatient={
-name:patient.name,
-phone:patient.phone,
-cc:cc.value,
-symptoms:symptoms,
-medHx:collect("mh_"),
-medHxOther:mh_other.value,
-famHx:collect("fh_"),
-famHxOther:fh_other.value,
-meds:meds.value,
-allergies:allergies.value,
-time:new Date().toLocaleString(),
-selectedTime: patient.selectedTime || "",
+name: patient.name,
+phone: patient.phone,
+cc: document.getElementById("cc").value,
+symptoms: symptoms,
+medHx: collect("mh_"),
+medHxOther: document.getElementById("mh_other").value,
+famHx: collect("fh_"),
+famHxOther: document.getElementById("fh_other").value,
+meds: document.getElementById("meds").value,
+allergies: document.getElementById("allergies").value,
+time: new Date().toLocaleString(),
+selectedTime: selectedTime,
 };
 
 // KEEP LOCAL STORAGE
@@ -469,16 +469,18 @@ fetch(SCRIPT_URL, {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    name: patient.name,
-    phone: patient.phone,
-    cc: cc.value,
-    symptoms: symptoms.join(", "),
-    medHx: collect("mh_").join(", "),
-    famHx: collect("fh_").join(", "),
-    meds: meds.value,
-    allergies: allergies.value,
-    selectedTime: patient.selectedTime || "",
-  })
+  name: patient.name,
+  phone: patient.phone,
+  cc: document.getElementById("cc").value,
+  symptoms: symptoms.join(", "),
+  medHx: collect("mh_").join(", "),
+  medHxOther: document.getElementById("mh_other").value,
+  famHx: collect("fh_").join(", "),
+  famHxOther: document.getElementById("fh_other").value,
+  meds: document.getElementById("meds").value,
+  allergies: document.getElementById("allergies").value,
+  selectedTime: selectedTime
+})
 })
 .then(res => res.text())
 .then(data => {
@@ -698,7 +700,7 @@ function removePatient(index){
 
   fetch(SCRIPT_URL + "?delete=1&name=" + encodeURIComponent(patient.name), {
     method: "GET",
-    mode: "no-cors"
+    
   });
 
   loadProvider();
