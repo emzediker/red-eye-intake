@@ -464,7 +464,28 @@ localStorage.setItem("patients", JSON.stringify(all));
 // ✅ SEND TO GOOGLE SHEETS
 fetch(SCRIPT_URL, {
   method: "POST",
-  mode: "no-cors",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: patient.name,
+    phone: patient.phone,
+    cc: cc.value,
+    symptoms: symptoms.join(", "),
+    medHx: collect("mh_").join(", "),
+    famHx: collect("fh_").join(", "),
+    meds: meds.value,
+    allergies: allergies.value,
+    selectedTime: patient.selectedTime || "",
+  })
+})
+.then(res => res.text())
+.then(data => {
+  console.log("SUCCESS:", data);
+})
+.catch(err => {
+  console.error("ERROR:", err);
+});
   headers: {
     "Content-Type": "application/json"
   },
