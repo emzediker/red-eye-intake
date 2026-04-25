@@ -240,8 +240,26 @@ ${medHx("fh_")}
 
 <div id="result"></div>
 `;
+
+setTimeout(generateTimeSlots, 100);
 }
 
+function handlePayment(){
+
+  if(!selectedTime){
+    alert("Please select a time first");
+    return;
+  }
+
+  // Save selected time into patient
+  patient.selectedTime = selectedTime;
+
+  // 🚨 TEMP (simulate payment)
+  submitForm();
+
+}
+  
+  
 function cb(id,label){
 return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
 }
