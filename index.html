@@ -277,14 +277,23 @@ function handlePayment(){
     return;
   }
 
-  // Save selected time into patient
-  patient.selectedTime = selectedTime;
+  // Save data first
+  saveBeforePayment();
 
-  // 🚨 TEMP (simulate payment)
-  submitForm();
+  const temp = JSON.parse(localStorage.getItem("pendingPatient")) || {};
+  temp.selectedTime = selectedTime;
+  localStorage.setItem("pendingPatient", JSON.stringify(temp));
+
+  // 🔥 SHOW POPUP
+  const modal = document.getElementById("paymentModal");
+  modal.style.display = "flex";
+
+  // ⏳ WAIT → then redirect
+  setTimeout(() => {
+    window.location.href = "https://buy.stripe.com/YOUR_LINK_HERE";
+  }, 1500);
 
 }
-  
   
 function cb(id,label){
 return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
