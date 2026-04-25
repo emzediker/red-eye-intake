@@ -220,15 +220,19 @@ ${medHx("fh_")}
 
 <div class="step" id="step5">
 
-<h3>Schedule Appointment</h3>
+<h3>Select Appointment Time</h3>
 
-<div class="card" style="text-align:center;">
-  
-  <p><b>Select a time for your telehealth visit.</b></p>
-  
-  <p>You will complete payment after booking.</p>
-  
-  <button onclick="goToSchedule()">Choose Appointment Time</button>
+<div id="timeSlots"></div>
+
+<br>
+
+<h3>Payment</h3>
+
+<div id="paymentBox" style="opacity:0.5; pointer-events:none;">
+
+  <p><b>$25 Telehealth Visit</b></p>
+
+  <button onclick="handlePayment()">Pay & Continue</button>
 
 </div>
 
@@ -256,6 +260,62 @@ ${cb(prefix+"none","None")}
 `;
 }
 
+let selectedTime = null;
+
+function generateTimeSlots(){
+
+  const container = document.getElementById("timeSlots");
+  container.innerHTML = "";
+
+  const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  days.forEach((day, index)=>{
+
+    let times = [];
+
+    // Weekdays
+    if(index < 5){
+      times = ["6:00 PM","7:00 PM","8:00 PM","9:00 PM"];
+    } else {
+      // Weekend
+      for(let i=8;i<=21;i++){
+        let hour = i > 12 ? i-12 : i;
+        let ampm = i >= 12 ? "PM" : "AM";
+        times.push(hour + ":00 " + ampm);
+      }
+    }
+
+    let html = `<div class="card"><b>${day}</b><br>`;
+
+    times.forEach(t=>{
+      html += `<div onclick="selectTime('${day} ${t}', this)" style="padding:6px;border:1px solid #ccc;margin:4px;cursor:pointer;">${t}</div>`;
+    });
+
+    html += `</div>`;
+
+    container.innerHTML += html;
+
+  });
+
+}
+
+function selectTime(time, el){
+
+  selectedTime = time;
+
+  // clear previous selections
+  document.querySelectorAll("#timeSlots div").forEach(d=>{
+    d.style.background="";
+  });
+
+  el.style.background = "#cce5ff";
+
+  // unlock payment
+  const payBox = document.getElementById("paymentBox");
+  payBox.style.opacity = "1";
+  payBox.style.pointerEvents = "auto";
+
+}
 // ================= FLOW =================
 
 function validate(){
