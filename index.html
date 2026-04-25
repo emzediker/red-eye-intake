@@ -85,10 +85,7 @@ if(isProvider){
 
     const saved = JSON.parse(localStorage.getItem("pendingPatient"));
 
-    if(saved){
-      patient.name = saved.name;
-      patient.phone = saved.phone;
-      patient.selectedTime = saved.selectedTime || "";
+    if(saved){patient = saved;
 
       setTimeout(() => {
         submitForm();
