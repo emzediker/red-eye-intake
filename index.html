@@ -470,16 +470,16 @@ fetch(SCRIPT_URL, {
   },
   body: JSON.stringify({
   name: patient.name,
-  phone: patient.phone,
-  cc: document.getElementById("cc").value,
-  symptoms: symptoms.join(", "),
-  medHx: collect("mh_").join(", "),
-  medHxOther: document.getElementById("mh_other").value,
-  famHx: collect("fh_").join(", "),
-  famHxOther: document.getElementById("fh_other").value,
-  meds: document.getElementById("meds").value,
-  allergies: document.getElementById("allergies").value,
-  selectedTime: selectedTime
+phone: patient.phone,
+cc: document.getElementById("cc").value,
+symptoms: symptoms.join(", "),
+medHx: collect("mh_").join(", "),
+medHxOther: document.getElementById("mh_other").value,
+famHx: collect("fh_").join(", "),
+famHxOther: document.getElementById("fh_other").value,
+meds: document.getElementById("meds").value,
+allergies: document.getElementById("allergies").value,
+selectedTime: selectedTime
 })
 })
 .then(res => res.text())
