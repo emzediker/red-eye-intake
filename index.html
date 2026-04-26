@@ -263,32 +263,16 @@ function handlePayment(){
     return;
   }
 
+  // Save data first
   submitForm();
-
-  const temp = JSON.parse(localStorage.getItem("pendingPatient")) || {};
-  temp.selectedTime = selectedTime;
-  localStorage.setItem("pendingPatient", JSON.stringify(temp));
 
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
 
-  // Try redirect
+  // Redirect to Stripe
   setTimeout(() => {
     window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
-  }, 1000);
-
-  // 🚨 FAILSAFE (if redirect doesn't happen)
-  setTimeout(() => {
-    modal.innerHTML = `
-      <div style="background:white;padding:20px;border-radius:8px;text-align:center;">
-        <h3>Payment didn’t load</h3>
-        <p>Please tap below to continue.</p>
-        <button onclick="window.location.href='https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02'">
-          Continue to Payment
-        </button>
-      </div>
-    `;
-  }, 4000);
+  }, 500);
 
 }
   
