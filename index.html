@@ -1,3 +1,12 @@
+Last codes tht works to send to gogle
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -256,7 +265,7 @@ ${medHx("fh_")}
 
   <p><b>$25 Telehealth Visit</b></p>
 
-<button onclick="handlePayment()">Pay & Continue</button>
+<button onclick="submitForm()">TEST SUBMIT</button>
 
 </div>
 
@@ -267,7 +276,6 @@ ${medHx("fh_")}
 
 setTimeout(generateTimeSlots, 100);
 }
- 
 
 function handlePayment(){
 
@@ -276,10 +284,8 @@ function handlePayment(){
     return;
   }
 
-  // Save ALL data before leaving
-  saveBeforePayment();
+  submitForm();
 
-  // Ensure selectedTime is saved too
   const temp = JSON.parse(localStorage.getItem("pendingPatient")) || {};
   temp.selectedTime = selectedTime;
   localStorage.setItem("pendingPatient", JSON.stringify(temp));
@@ -287,10 +293,12 @@ function handlePayment(){
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
 
-  // 🔥 Immediate redirect (no delay needed)
-  window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
+  // Try redirect
+  setTimeout(() => {
+    window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
+  }, 1000);
 
-  // 🚨 Failsafe (only triggers if redirect fails)
+  // 🚨 FAILSAFE (if redirect doesn't happen)
   setTimeout(() => {
     modal.innerHTML = `
       <div style="background:white;padding:20px;border-radius:8px;text-align:center;">
