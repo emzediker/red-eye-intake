@@ -458,6 +458,11 @@ fetch(SCRIPT_URL, {
 .catch(err => {
   console.error("ERROR:", err);
 });
+
+localStorage.setItem("lastPatient", JSON.stringify({
+  name: patient.name,
+  phone: patient.phone
+}));
   
 }
 
@@ -505,6 +510,10 @@ function goToSchedule(){
 }
   
 function showPaidScreen(){
+
+  // 🔥 SEND SMS AFTER PAYMENT
+  sendSMSAfterPayment();
+
   document.getElementById("app").innerHTML=`
   <div class="result green">
     <h2>✅ Payment Successful</h2>
@@ -512,6 +521,23 @@ function showPaidScreen(){
     <br>
     <button onclick="join()">Join Visit</button>
   </div>`;
+}
+
+function sendSMSAfterPayment(){
+
+  const saved = JSON.parse(localStorage.getItem("lastPatient")) || {};
+
+  if(!saved.phone) return;
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "sendSMS",
+      name: saved.name,
+      phone: saved.phone
+    })
+  });
+
 }
 // ================= PROVIDER =================
 
