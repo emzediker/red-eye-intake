@@ -79,9 +79,11 @@ if(isProvider){
   loadProvider();
 } else {
 
-  loadPatient();
-
-
+  if(paid){
+    showPaidScreen();
+  } else {
+    loadPatient();
+  }
 
 }
 
