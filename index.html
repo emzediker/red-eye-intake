@@ -81,20 +81,7 @@ if(isProvider){
 
   loadPatient();
 
-  // AFTER LOAD → check if returning from Stripe
-  if(paid){
 
-    const saved = JSON.parse(localStorage.getItem("pendingPatient"));
-
-    if(saved){patient = saved;
-
-      setTimeout(() => {
-        submitForm();
-        localStorage.removeItem("pendingPatient");
-      }, 500);
-    }
-
-  }
 
 }
 
