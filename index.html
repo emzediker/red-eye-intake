@@ -459,25 +459,24 @@ all.push(newPatient);
 localStorage.setItem("patients", JSON.stringify(all));
 
 // ✅ SEND TO GOOGLE SHEETS
+const formData = new URLSearchParams();
+
+formData.append("name", patient.name);
+formData.append("phone", patient.phone);
+formData.append("cc", document.getElementById("cc").value);
+formData.append("symptoms", symptoms.join(", "));
+formData.append("medHx", collect("mh_").join(", "));
+formData.append("medHxOther", document.getElementById("mh_other").value);
+formData.append("famHx", collect("fh_").join(", "));
+formData.append("famHxOther", document.getElementById("fh_other").value);
+formData.append("meds", document.getElementById("meds").value);
+formData.append("allergies", document.getElementById("allergies").value);
+formData.append("selectedTime", selectedTime);
+
 fetch(SCRIPT_URL, {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-  name: patient.name,
-phone: patient.phone,
-cc: document.getElementById("cc").value,
-symptoms: symptoms.join(", "),
-medHx: collect("mh_").join(", "),
-medHxOther: document.getElementById("mh_other").value,
-famHx: collect("fh_").join(", "),
-famHxOther: document.getElementById("fh_other").value,
-meds: document.getElementById("meds").value,
-allergies: document.getElementById("allergies").value,
-selectedTime: selectedTime
-})
-})
+  body: formData
+});
 .then(res => res.text())
 .then(data => {
   console.log("SUCCESS:", data);
