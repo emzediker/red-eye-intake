@@ -267,6 +267,7 @@ ${medHx("fh_")}
 
 setTimeout(generateTimeSlots, 100);
 }
+ 
 
 function handlePayment(){
 
@@ -275,8 +276,10 @@ function handlePayment(){
     return;
   }
 
+  // Save ALL data before leaving
   saveBeforePayment();
 
+  // Ensure selectedTime is saved too
   const temp = JSON.parse(localStorage.getItem("pendingPatient")) || {};
   temp.selectedTime = selectedTime;
   localStorage.setItem("pendingPatient", JSON.stringify(temp));
@@ -284,12 +287,10 @@ function handlePayment(){
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
 
-  // Try redirect
-  setTimeout(() => {
-    window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
-  }, 1000);
+  // 🔥 Immediate redirect (no delay needed)
+  window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
 
-  // 🚨 FAILSAFE (if redirect doesn't happen)
+  // 🚨 Failsafe (only triggers if redirect fails)
   setTimeout(() => {
     modal.innerHTML = `
       <div style="background:white;padding:20px;border-radius:8px;text-align:center;">
