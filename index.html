@@ -476,7 +476,7 @@ formData.append("selectedTime", selectedTime);
 fetch(SCRIPT_URL, {
   method: "POST",
   body: formData
-});
+})
 .then(res => res.text())
 .then(data => {
   console.log("SUCCESS:", data);
