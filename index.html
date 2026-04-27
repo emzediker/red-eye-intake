@@ -512,9 +512,11 @@ function goToSchedule(){
 function showPaidScreen(){
 
   const last = JSON.parse(localStorage.getItem("lastPatient"));
+  const alreadySent = localStorage.getItem("smsSent");
 
-  // 🔥 SEND SMS NOW (AFTER PAYMENT)
-  if(last){
+  // 🔥 SEND SMS ONLY ONCE
+  if(last && !alreadySent){
+
     fetch(SCRIPT_URL, {
       method: "POST",
       body: new URLSearchParams({
@@ -523,6 +525,8 @@ function showPaidScreen(){
         phone: last.phone
       })
     });
+
+    localStorage.setItem("smsSent", "1");
   }
 
   document.getElementById("app").innerHTML=`
@@ -533,23 +537,17 @@ function showPaidScreen(){
     <button onclick="join()">Join Visit</button>
   </div>`;
 }
-  
-function sendSMSAfterPayment(){
 
-  const saved = JSON.parse(localStorage.getItem("lastPatient")) || {};
-
-  if(!saved.phone) return;
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: new URLSearchParams({
-      action: "sendSMS",
-      name: saved.name,
-      phone: saved.phone
-    })
-  });
-
+  document.getElementById("app").innerHTML=`
+  <div class="result green">
+    <h2>✅ Payment Successful</h2>
+    <p>You may now join your visit.</p>
+    <br>
+    <button onclick="join()">Join Visit</button>
+  </div>`;
 }
+  
+
 // ================= PROVIDER =================
 
 function loadProvider(){
