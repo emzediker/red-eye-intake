@@ -257,7 +257,15 @@ ${medHx("fh_")}
 <div id="result"></div>
 `;
 
-setTimeout(generateTimeSlots, 100);
+fetch(SCRIPT_URL)
+  .then(res => res.json())
+  .then(data => {
+    bookedTimes = data.map(p => p.appointmentTime).filter(Boolean);
+    generateTimeSlots();
+  })
+  .catch(() => {
+    generateTimeSlots(); // fallback
+  });
 }
 
 function handlePayment(){
