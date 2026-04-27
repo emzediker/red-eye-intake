@@ -303,36 +303,55 @@ function generateTimeSlots(){
   const container = document.getElementById("timeSlots");
   container.innerHTML = "";
 
-  const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const now = new Date();
 
-  days.forEach((day, index)=>{
+  for(let d = 0; d < 7; d++){
+
+    const date = new Date();
+    date.setDate(now.getDate() + d);
+
+    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+    const fullDate = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric"
+    });
 
     let times = [];
 
     // Weekdays
-    if(index < 5){
-      times = ["6:00 PM","7:00 PM","8:00 PM","9:00 PM"];
+    if(date.getDay() >= 1 && date.getDay() <= 5){
+      times = [18,19,20,21]; // 6–9 PM
     } else {
-      // Weekend
+      // Weekend 8AM–9PM
       for(let i=8;i<=21;i++){
-        let hour = i > 12 ? i-12 : i;
-        let ampm = i >= 12 ? "PM" : "AM";
-        times.push(hour + ":00 " + ampm);
+        times.push(i);
       }
     }
 
-    let html = `<div class="card"><b>${day}</b><br>`;
+    let html = `<div class="card"><b>${dayName} (${fullDate})</b><br>`;
 
-    times.forEach(t=>{
-      html += `<div onclick="selectTime('${day} ${t}', this)" style="padding:6px;border:1px solid #ccc;margin:4px;cursor:pointer;">${t}</div>`;
+    times.forEach(hour=>{
+
+      const slotTime = new Date(date);
+      slotTime.setHours(hour,0,0,0);
+
+      // ❌ Skip past times
+      if(slotTime <= now) return;
+
+      let displayHour = hour > 12 ? hour - 12 : hour;
+      let ampm = hour >= 12 ? "PM" : "AM";
+
+      let label = `${displayHour}:00 ${ampm}`;
+
+      html += `<div onclick="selectTime('${fullDate} ${label}', this)" 
+        style="padding:6px;border:1px solid #ccc;margin:4px;cursor:pointer;">
+        ${label}
+      </div>`;
     });
 
     html += `</div>`;
-
     container.innerHTML += html;
-
-  });
-
+  }
 }
 
 function selectTime(time, el){
