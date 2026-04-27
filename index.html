@@ -362,8 +362,9 @@ function generateTimeSlots(){
     let displayHour = hour > 12 ? hour - 12 : hour;
     let ampm = hour >= 12 ? "PM" : "AM";
 
-    let label = `${dayName} (${fullDate}) - ${displayHour}:00 ${ampm}`;
-    const fullLabel = `${fullDate} ${label}`;
+    let timeLabel = `${displayHour}:00 ${ampm}`;
+let fullLabel = `${fullDate} ${timeLabel}`; // MUST match what you save
+let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 
     container.innerHTML += `
       <div class="card" onclick="selectTime('${label}', this)">
