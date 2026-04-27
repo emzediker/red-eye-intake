@@ -361,12 +361,18 @@ function generateTimeSlots(){
     let hour = slot.getHours();
     let displayHour = hour > 12 ? hour - 12 : hour;
     let ampm = hour >= 12 ? "PM" : "AM";
-
-    let timeLabel = `${displayHour}:00 ${ampm}`;
-let fullLabel = `${fullDate} ${timeLabel}`; // MUST match what you save
+let timeLabel = `${displayHour}:00 ${ampm}`;
+let fullLabel = `${fullDate} ${timeLabel}`;
 let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 
-if(bookedTimes.includes(fullLabel)){
+// 🔥 NEW — timestamp comparison
+const slotTimestamp = slot.getTime();
+
+const isBooked = bookedTimes.some(t =>
+  Number(t) === slotTimestamp
+);
+
+if(isBooked){
   container.innerHTML += `
     <div class="card" style="
       background:#eee;
