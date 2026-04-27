@@ -475,8 +475,9 @@ formData.append("famHx", collect("fh_").join(", "));
 formData.append("famHxOther", document.getElementById("fh_other").value);
 formData.append("meds", document.getElementById("meds").value);
 formData.append("allergies", document.getElementById("allergies").value);
-formData.append("selectedTime", selectedTime);
-
+formData.append("appointmentTime", selectedTime);
+formData.append("submittedAt", new Date().toLocaleString());
+  
 fetch(SCRIPT_URL, {
   method: "POST",
   body: formData
