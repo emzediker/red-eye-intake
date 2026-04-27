@@ -385,7 +385,7 @@ if(isBooked){
   `;
 } else {
   container.innerHTML += `
-    <div class="card" onclick="selectTime('${fullLabel}', this)">
+    <div class="card" onclick="selectTime(${slot.getTime()}, this)"
       ${displayLabel}
     </div>
   `;
@@ -506,8 +506,7 @@ formData.append("famHx", collect("fh_").join(", "));
 formData.append("famHxOther", document.getElementById("fh_other").value);
 formData.append("meds", document.getElementById("meds").value);
 formData.append("allergies", document.getElementById("allergies").value);
-const timestamp = new Date(selectedTime).getTime();
-formData.append("appointmentTime", timestamp);
+formData.append("appointmentTime", selectedTime);
 formData.append("submittedAt", new Date().toLocaleString());
   
 fetch(SCRIPT_URL, {
