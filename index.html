@@ -350,7 +350,7 @@ function generateTimeSlots(){
     });
 
     html += `</div>`;
-    if(!html.includes("onclick")) return;
+    if(!html.includes("onclick")) continue;
     container.innerHTML += html;
   }
 }
