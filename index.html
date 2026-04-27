@@ -69,8 +69,10 @@ const providers = {
   "Sophia Brown, OD": { npi: "1750279949" }
 };
 
+let bookedTimes = [];
 let doctorName = "Emily Zediker, OD";
 let currentIndex = null;
+
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
 let patient={};
