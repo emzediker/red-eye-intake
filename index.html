@@ -387,7 +387,7 @@ if(isBooked){
   `;
 } else {
   container.innerHTML += `
-    <div class="card" onclick="selectTime(${slot.getTime()}, this)"
+    <div class="card" onclick="selectTime(${slot.getTime()}, this)">
       ${displayLabel}
     </div>
   `;
