@@ -366,11 +366,24 @@ function generateTimeSlots(){
 let fullLabel = `${fullDate} ${timeLabel}`; // MUST match what you save
 let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 
-    container.innerHTML += `
-      <div class="card" onclick="selectTime('${label}', this)">
-        ${label}
-      </div>
-    `;
+if(bookedTimes.includes(fullLabel)){
+  container.innerHTML += `
+    <div class="card" style="
+      background:#eee;
+      color:#888;
+      text-decoration:line-through;
+      cursor:not-allowed;
+    ">
+      ${displayLabel} (Booked)
+    </div>
+  `;
+} else {
+  container.innerHTML += `
+    <div class="card" onclick="selectTime('${fullLabel}', this)">
+      ${displayLabel}
+    </div>
+  `;
+}
   });
 
   if(slotsToShow.length === 0){
