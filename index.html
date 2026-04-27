@@ -508,11 +508,22 @@ function goToSchedule(){
   window.location.href = "https://calendly.com/emzediker/30min";
 
 }
-  
+
 function showPaidScreen(){
 
-  // 🔥 SEND SMS AFTER PAYMENT
-  sendSMSAfterPayment();
+  const last = JSON.parse(localStorage.getItem("lastPatient"));
+
+  // 🔥 SEND SMS NOW (AFTER PAYMENT)
+  if(last){
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "sendSMS",
+        name: last.name,
+        phone: last.phone
+      })
+    });
+  }
 
   document.getElementById("app").innerHTML=`
   <div class="result green">
@@ -522,7 +533,7 @@ function showPaidScreen(){
     <button onclick="join()">Join Visit</button>
   </div>`;
 }
-
+  
 function sendSMSAfterPayment(){
 
   const saved = JSON.parse(localStorage.getItem("lastPatient")) || {};
