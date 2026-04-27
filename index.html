@@ -629,7 +629,7 @@ fetch(SCRIPT_URL)
       <div class="card" onclick="openChart(${i})">
       <b>${p.name}</b><br>
       ${p.phone}<br>
-      ${p.time}
+      ${new Date(Number(p.appointmentTime)).toLocaleString()}
       </div>`;
     });
 
@@ -669,7 +669,8 @@ ${doctorSelector}
 
 <b>Name:</b> ${p.name}<br>
 <b>Phone:</b> ${p.phone}<br>
-<b>Date:</b> ${p.time}<br><br>
+<b>Appointment:</b> ${new Date(Number(p.appointmentTime)).toLocaleString()}<br>
+<b>Submitted:</b> ${p.submittedAt || ""}
 
 <div class="soap-section">
 <div class="soap-title">S: Subjective</div>
