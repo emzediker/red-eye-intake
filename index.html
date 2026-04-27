@@ -304,57 +304,67 @@ function generateTimeSlots(){
   container.innerHTML = "";
 
   const now = new Date();
+  let allSlots = [];
 
+  // Build ALL future slots
   for(let d = 0; d < 7; d++){
 
     const date = new Date();
     date.setDate(now.getDate() + d);
 
-    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-    const fullDate = date.toLocaleDateString("en-US", {
+    let hours = [];
+
+    // Weekdays
+    if(date.getDay() >= 1 && date.getDay() <= 5){
+      hours = [18,19,20,21]; // 6–9 PM
+    } else {
+      // Weekend
+      for(let i=8;i<=21;i++){
+        hours.push(i);
+      }
+    }
+
+    hours.forEach(hour => {
+      const slot = new Date(date);
+      slot.setHours(hour,0,0,0);
+
+      if(slot > now){
+        allSlots.push(slot);
+      }
+    });
+  }
+
+  // ✅ SORT by earliest time
+  allSlots.sort((a,b)=> a - b);
+
+  // ✅ Display top 12 (optional limit)
+  const slotsToShow = allSlots.slice(0, 12);
+
+  slotsToShow.forEach(slot => {
+
+    const dayName = slot.toLocaleDateString("en-US", { weekday: "short" });
+    const fullDate = slot.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric"
     });
 
-    let times = [];
+    let hour = slot.getHours();
+    let displayHour = hour > 12 ? hour - 12 : hour;
+    let ampm = hour >= 12 ? "PM" : "AM";
 
-    // Weekdays
-    if(date.getDay() >= 1 && date.getDay() <= 5){
-      times = [18,19,20,21]; // 6–9 PM
-    } else {
-      // Weekend 8AM–9PM
-      for(let i=8;i<=21;i++){
-        times.push(i);
-      }
-    }
+    let label = `${dayName} (${fullDate}) - ${displayHour}:00 ${ampm}`;
 
-    let html = `<div class="card"><b>${dayName} (${fullDate})</b><br>`;
-
-    times.forEach(hour=>{
-
-      const slotTime = new Date(date);
-      slotTime.setHours(hour,0,0,0);
-
-      // ❌ Skip past times
-      if(slotTime <= now) return;
-
-      let displayHour = hour > 12 ? hour - 12 : hour;
-      let ampm = hour >= 12 ? "PM" : "AM";
-
-      let label = `${displayHour}:00 ${ampm}`;
-
-      html += `<div onclick="selectTime('${fullDate} ${label}', this)" 
-        style="padding:6px;border:1px solid #ccc;margin:4px;cursor:pointer;">
+    container.innerHTML += `
+      <div class="card" onclick="selectTime('${label}', this)">
         ${label}
-      </div>`;
-    });
+      </div>
+    `;
+  });
 
-    html += `</div>`;
-    if(!html.includes("onclick")) continue;
-    container.innerHTML += html;
+  if(slotsToShow.length === 0){
+    container.innerHTML = "<p>No available times. Please check back later.</p>";
   }
 }
-
 function selectTime(time, el){
 
   selectedTime = time;
