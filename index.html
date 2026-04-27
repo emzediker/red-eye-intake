@@ -500,7 +500,8 @@ formData.append("famHx", collect("fh_").join(", "));
 formData.append("famHxOther", document.getElementById("fh_other").value);
 formData.append("meds", document.getElementById("meds").value);
 formData.append("allergies", document.getElementById("allergies").value);
-formData.append("appointmentTime", selectedTime);
+const timestamp = new Date(selectedTime).getTime();
+formData.append("appointmentTime", timestamp);
 formData.append("submittedAt", new Date().toLocaleString());
   
 fetch(SCRIPT_URL, {
