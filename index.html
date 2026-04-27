@@ -270,7 +270,7 @@ function handlePayment(){
 
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
-
+localStorage.removeItem("smsSent");
   // Redirect to Stripe
   setTimeout(() => {
     window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
