@@ -525,7 +525,8 @@ fetch(SCRIPT_URL, {
 
 localStorage.setItem("lastPatient", JSON.stringify({
   name: patient.name,
-  phone: patient.phone
+  phone: patient.phone,
+  appointmentTime: selectedTime
 }));
 
 // ✅ RESET SMS FLAG FOR NEW PATIENT
