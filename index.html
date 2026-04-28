@@ -585,13 +585,14 @@ function showPaidScreen(){
   if(last && !alreadySent){
 
     fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "sendSMS",
-        name: last.name,
-        phone: last.phone
-      })
-    });
+  method: "POST",
+  body: new URLSearchParams({
+    action: "sendSMS",
+    name: last.name,
+    phone: last.phone,
+    appointmentTime: last.appointmentTime
+  })
+});
 
     localStorage.setItem("smsSent", "1");
   }
