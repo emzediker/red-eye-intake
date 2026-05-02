@@ -301,6 +301,7 @@ function handlePayment(){
 
   formData.append("name", patient.name);
   formData.append("phone", patient.phone);
+  formData.append("email", patient.email);
   formData.append("cc", document.getElementById("cc").value);
   formData.append("symptoms", symptoms.join(", "));
   formData.append("medHx", collect("mh_").join(", "));
@@ -553,6 +554,7 @@ const formData = new URLSearchParams();
 
 formData.append("name", patient.name);
 formData.append("phone", patient.phone);
+formData.append("email", patient.email);
 formData.append("cc", document.getElementById("cc").value);
 formData.append("symptoms", symptoms.join(", "));
 formData.append("medHx", collect("mh_").join(", "));
