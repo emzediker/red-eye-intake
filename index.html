@@ -644,11 +644,11 @@ function showPaidScreen(){
     fetch(SCRIPT_URL, {
   method: "POST",
   body: new URLSearchParams({
-    action: "sendSMS",
-    name: last.name,
-    phone: last.phone,
-    appointmentTime: last.appointmentTime
-  })
+  action: "sendSMS",
+  name: last.name,
+  phone: last.phone,
+  appointmentTime: last.appointmentTime,
+  email: last.email
 });
 
     localStorage.setItem("smsSent", "1");
