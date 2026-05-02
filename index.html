@@ -466,15 +466,19 @@ function selectTime(time, el){
 }
 // ================= FLOW =================
 
-function validate(){
-const name=document.getElementById("name").value;
-const phone=document.getElementById("phone").value;
+const name = document.getElementById("name").value;
+const phone = document.getElementById("phone").value;
+const email = document.getElementById("email").value;
 
-if(!name||!phone){alert("Enter info");return;}
+if(!name || !phone || !email){
+  alert("Enter all info");
+  return;
+}
 
-patient.name=name;
-patient.phone=phone;
-
+patient.name = name;
+patient.phone = phone;
+patient.email = email;
+  
 next(2);
 }
 
