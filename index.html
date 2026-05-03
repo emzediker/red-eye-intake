@@ -467,20 +467,22 @@ function selectTime(time, el){
 }
 // ================= FLOW =================
 
-const name = document.getElementById("name").value;
-const phone = document.getElementById("phone").value;
-const email = document.getElementById("email").value;
+function validate(){
 
-if(!name || !phone || !email){
-  alert("Enter all info");
-  return;
-}
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
 
-patient.name = name;
-patient.phone = phone;
-patient.email = email;
-  
-next(2);
+  if(!name || !phone || !email){
+    alert("Enter all info");
+    return;
+  }
+
+  patient.name = name;
+  patient.phone = phone;
+  patient.email = email;
+
+  next(2);
 }
 
 function next(step){
