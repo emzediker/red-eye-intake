@@ -297,54 +297,6 @@ function handlePayment(){
   window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
 }
 
-  function collect(prefix){
-    let arr=[];
-    ["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
-      if(document.getElementById(prefix+x).checked){arr.push(x);}
-    });
-    return arr;
-  }
-
-  const formData = new URLSearchParams();
-
-  formData.append("name", patient.name);
-  formData.append("phone", patient.phone);
-  formData.append("email", patient.email);
-  formData.append("cc", document.getElementById("cc").value);
-  formData.append("symptoms", symptoms.join(", "));
-  formData.append("medHx", collect("mh_").join(", "));
-  formData.append("medHxOther", document.getElementById("mh_other").value);
-  formData.append("famHx", collect("fh_").join(", "));
-  formData.append("famHxOther", document.getElementById("fh_other").value);
-  formData.append("meds", document.getElementById("meds").value);
-  formData.append("allergies", document.getElementById("allergies").value);
-  formData.append("appointmentTime", selectedTime);
-  formData.append("submittedAt", new Date().toLocaleString());
-
-// 🔥 SAVE before redirect
-formData.append("action", "book");
-
-
-
-  // ✅ Store for SMS later
-  localStorage.setItem("lastPatient", JSON.stringify({
-    name: patient.name,
-    phone: patient.phone,
-    appointmentTime: selectedTime,
-    email: patient.email
-  }));
-
-  localStorage.removeItem("smsSent");
-
-  // 🚀 redirect AFTER success
-  window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
-})
-.catch(err => {
-  alert("Error saving data. Please try again.");
-  console.error(err);
-});
-    
-}
   
 function cb(id,label){
 return `<div class="check-row"><input type="checkbox" id="${id}"><span>${label}</span></div>`;
