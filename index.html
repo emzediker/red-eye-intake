@@ -862,8 +862,8 @@ async function removePatient(index){
 
   try {
     const res = await fetch(
-      `${SCRIPT_URL}?delete=1&name=${encodeURIComponent(patient.name)}`
-    );
+  `${SCRIPT_URL}?delete=1&appointmentTime=${encodeURIComponent(patient.appointmentTime)}`
+);
 
     const data = await res.json();
 
