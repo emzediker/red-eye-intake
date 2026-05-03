@@ -316,13 +316,7 @@ function handlePayment(){
 // 🔥 SAVE before redirect
 formData.append("action", "book");
 
-fetch(SCRIPT_URL, {
-  method: "POST",
-  body: formData
-})
-.then(res => res.text())
-.then(data => {
-  console.log("Saved:", data);
+
 
   // ✅ Store for SMS later
   localStorage.setItem("lastPatient", JSON.stringify({
