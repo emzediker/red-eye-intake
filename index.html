@@ -324,10 +324,11 @@ function handlePayment(){
 
     // ✅ Store for SMS later
     localStorage.setItem("lastPatient", JSON.stringify({
-      name: patient.name,
-      phone: patient.phone,
-      appointmentTime: selectedTime
-    }));
+  name: patient.name,
+  phone: patient.phone,
+  appointmentTime: selectedTime,
+  email: patient.email
+}));
 
     localStorage.removeItem("smsSent");
 
