@@ -281,19 +281,41 @@ function handlePayment(){
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
 
-  // ✅ Save patient for after payment
+  // 🔥 collect symptoms
+  let symptoms=[];
+  if(redness.checked) symptoms.push("Red eye");
+  if(itching.checked) symptoms.push("Itching");
+  if(discharge.checked) symptoms.push("Discharge");
+  if(lid.checked) symptoms.push("Stye");
+  if(irritation.checked) symptoms.push("Irritation");
+
+  function collect(prefix){
+    let arr=[];
+    ["diabetes","htn","chol","cancer","autoimmune","thyroid","asthma","heart"].forEach(x=>{
+      if(document.getElementById(prefix+x).checked){arr.push(x);}
+    });
+    return arr;
+  }
+
+  // 🔥 STORE FULL DATA
   localStorage.setItem("lastPatient", JSON.stringify({
     name: patient.name,
     phone: patient.phone,
-    appointmentTime: selectedTime,
-    email: patient.email
+    email: patient.email,
+    cc: document.getElementById("cc").value,
+    symptoms: symptoms.join(", "),
+    medHx: collect("mh_").join(", "),
+    medHxOther: document.getElementById("mh_other").value,
+    famHx: collect("fh_").join(", "),
+    famHxOther: document.getElementById("fh_other").value,
+    meds: document.getElementById("meds").value,
+    allergies: document.getElementById("allergies").value,
+    appointmentTime: selectedTime
   }));
 
-  // reset flags
   localStorage.removeItem("smsSent");
   localStorage.removeItem("bookedSent");
 
-  // 🚀 Redirect to Stripe ONLY
   window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
 }
 
