@@ -713,7 +713,9 @@ fetch(SCRIPT_URL)
 
     let html="<h2>Patient Queue</h2>";
 
-    window.livePatients.forEach((p,i)=>{
+    window.livePatients
+  .filter(p => p.status === "BOOKED")
+  .forEach((p,i)=>{
       html+=`
       <div class="card" onclick="openChart(${i})">
       <b>${p.name}</b><br>
