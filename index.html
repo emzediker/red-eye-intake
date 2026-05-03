@@ -422,7 +422,7 @@ let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 const slotTimestamp = slot.getTime();
 
 const isBooked = bookedTimes.some(t =>
-  Number(t) === slotTimestamp
+  Math.abs(Number(t) - slotTimestamp) < 60000
 );
 
 if(isBooked){
