@@ -620,21 +620,41 @@ function goToSchedule(){
 function showPaidScreen(){
 
   const last = JSON.parse(localStorage.getItem("lastPatient"));
-  const alreadySent = localStorage.getItem("smsSent");
+  const alreadyBooked = localStorage.getItem("bookedSent");
 
-  // 🔥 SEND SMS ONLY ONCE
-  if(last && !alreadySent){
+  if(last && !alreadyBooked){
+
+    const formData = new URLSearchParams();
+
+    formData.append("action", "book");
+    formData.append("name", last.name);
+    formData.append("phone", last.phone);
+    formData.append("email", last.email);
+    formData.append("appointmentTime", last.appointmentTime);
+    formData.append("submittedAt", new Date().toLocaleString());
 
     fetch(SCRIPT_URL, {
-  method: "POST",
-  body: new URLSearchParams({
-  action: "sendSMS",
-  name: last.name,
-  phone: last.phone,
-  appointmentTime: last.appointmentTime,
-  email: last.email
-})
-});
+      method: "POST",
+      body: formData
+    });
+
+    localStorage.setItem("bookedSent", "1");
+  }
+
+  // 🔥 KEEP YOUR SMS LOGIC
+  const alreadySent = localStorage.getItem("smsSent");
+
+  if(last && !alreadySent){
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "sendSMS",
+        name: last.name,
+        phone: last.phone,
+        appointmentTime: last.appointmentTime,
+        email: last.email
+      })
+    });
 
     localStorage.setItem("smsSent", "1");
   }
