@@ -698,33 +698,6 @@ function showPaidScreen(){
     <button onclick="join()">Join Visit</button>
   </div>`;
 }
-
-  // 🔥 KEEP YOUR SMS LOGIC
-  const alreadySent = localStorage.getItem("smsSent");
-
-  if(last && !alreadySent){
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "sendSMS",
-        name: last.name,
-        phone: last.phone,
-        appointmentTime: last.appointmentTime,
-        email: last.email
-      })
-    });
-
-    localStorage.setItem("smsSent", "1");
-  }
-
-  document.getElementById("app").innerHTML=`
-  <div class="result green">
-    <h2>✅ Payment Successful</h2>
-    <p>You may now join your visit.</p>
-    <br>
-    <button onclick="join()">Join Visit</button>
-  </div>`;
-}
   
   
 
