@@ -449,8 +449,33 @@ if(isBooked){
     container.innerHTML = "<p>No available times. Please check back later.</p>";
   }
 }
-function selectTime(time, el){
+async function selectTime(time, el){
 
+  // 🔒 attempt HOLD first
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "hold",
+        appointmentTime: time,
+        name: patient.name || "HOLD"
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.status === "taken"){
+      alert("That time was just taken. Please select another.");
+      loadPatient(); // refresh slots
+      return;
+    }
+
+  } catch(err){
+    alert("Error locking time");
+    return;
+  }
+
+  // ✅ proceed if held
   selectedTime = time;
 
   // clear previous selections
@@ -464,7 +489,6 @@ function selectTime(time, el){
   const payBox = document.getElementById("paymentBox");
   payBox.style.opacity = "1";
   payBox.style.pointerEvents = "auto";
-
 }
 // ================= FLOW =================
 
