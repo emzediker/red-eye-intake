@@ -281,13 +281,20 @@ function handlePayment(){
   const modal = document.getElementById("paymentModal");
   modal.style.display = "flex";
 
-  // 🔥 Build EXACT same data as submitForm()
-  let symptoms=[];
-  if(redness.checked) symptoms.push("Red eye");
-  if(itching.checked) symptoms.push("Itching");
-  if(discharge.checked) symptoms.push("Discharge");
-  if(lid.checked) symptoms.push("Stye");
-  if(irritation.checked) symptoms.push("Irritation");
+  // ✅ Store for later (after Stripe)
+  localStorage.setItem("lastPatient", JSON.stringify({
+    name: patient.name,
+    phone: patient.phone,
+    appointmentTime: selectedTime,
+    email: patient.email
+  }));
+
+  localStorage.removeItem("smsSent");
+  localStorage.removeItem("bookedSent");
+
+  // 🚀 Redirect to Stripe ONLY
+  window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
+}
 
   function collect(prefix){
     let arr=[];
