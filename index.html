@@ -313,32 +313,35 @@ function handlePayment(){
   formData.append("appointmentTime", selectedTime);
   formData.append("submittedAt", new Date().toLocaleString());
 
-  // 🔥 SAVE before redirect
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.text())
-  .then(data => {
-    console.log("Saved:", data);
+// 🔥 SAVE before redirect
+formData.append("action", "book");
 
-    // ✅ Store for SMS later
-    localStorage.setItem("lastPatient", JSON.stringify({
-  name: patient.name,
-  phone: patient.phone,
-  appointmentTime: selectedTime,
-  email: patient.email
-}));
+fetch(SCRIPT_URL, {
+  method: "POST",
+  body: formData
+})
+.then(res => res.text())
+.then(data => {
+  console.log("Saved:", data);
 
-    localStorage.removeItem("smsSent");
+  // ✅ Store for SMS later
+  localStorage.setItem("lastPatient", JSON.stringify({
+    name: patient.name,
+    phone: patient.phone,
+    appointmentTime: selectedTime,
+    email: patient.email
+  }));
 
-    // 🚀 ONLY redirect AFTER success
-    window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
-  })
-  .catch(err => {
-    alert("Error saving data. Please try again.");
-    console.error(err);
-  });
+  localStorage.removeItem("smsSent");
+
+  // 🚀 redirect AFTER success
+  window.location.href = "https://buy.stripe.com/28E5kDbR1bb1eSpdiW2cg02";
+})
+.catch(err => {
+  alert("Error saving data. Please try again.");
+  console.error(err);
+});
+    
 }
   
 function cb(id,label){
