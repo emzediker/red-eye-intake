@@ -639,31 +639,7 @@ function goToSchedule(){
 
 }
 
-const last = JSON.parse(localStorage.getItem("lastPatient"));
 
-const formData = new URLSearchParams();
-
-formData.append("action", "book");
-formData.append("name", last.name);
-formData.append("phone", last.phone);
-formData.append("email", last.email);
-formData.append("cc", last.cc);
-formData.append("symptoms", last.symptoms);
-formData.append("medHx", last.medHx);
-formData.append("medHxOther", last.medHxOther);
-formData.append("famHx", last.famHx);
-formData.append("famHxOther", last.famHxOther);
-formData.append("meds", last.meds);
-formData.append("allergies", last.allergies);
-formData.append("appointmentTime", last.appointmentTime);
-formData.append("submittedAt", new Date().toLocaleString());
-
-fetch(SCRIPT_URL, {
-  method: "POST",
-  body: formData
-});
-    localStorage.setItem("bookedSent", "1");
-  }
 
   // 🔥 KEEP YOUR SMS LOGIC
   const alreadySent = localStorage.getItem("smsSent");
