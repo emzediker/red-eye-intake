@@ -398,11 +398,31 @@ let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 // 🔥 NEW — timestamp comparison
 const slotTimestamp = slot.getTime();
 
-const isBooked = bookedTimes.some(t =>
-  Math.abs(Number(t) - slotTimestamp) < 60000
+const now = Date.now();
+
+const match = appointments.find(p =>
+  Math.abs(Number(p.appointmentTime) - slotTimestamp) < 60000
 );
 
-if(isBooked){
+let isBlocked = false;
+
+if (match) {
+
+  if (match.status === "BOOKED") {
+    isBlocked = true;
+  }
+
+  if (match.status === "HOLD") {
+    const holdTime = new Date(match.submittedAt).getTime();
+
+    if ((now - holdTime) < (5 * 60 * 1000)) {
+      isBlocked = true;
+    }
+  }
+}
+
+if (isBlocked) {
+
   container.innerHTML += `
     <div class="card" style="
       background:#eee;
@@ -410,21 +430,18 @@ if(isBooked){
       text-decoration:line-through;
       cursor:not-allowed;
     ">
-      ${displayLabel} (Booked)
-    </div>
-  `;
-} else {
-  container.innerHTML += `
-    <div class="card" onclick="selectTime(${slot.getTime()}, this)">
       ${displayLabel}
     </div>
   `;
-}
-  });
 
-  if(slotsToShow.length === 0){
-    container.innerHTML = "<p>No available times. Please check back later.</p>";
-  }
+} else {
+
+  container.innerHTML += `
+    <div class="card" onclick="selectTime(${slotTimestamp}, this)">
+      ${displayLabel}
+    </div>
+  `;
+
 }
 async function selectTime(time, el){
 
