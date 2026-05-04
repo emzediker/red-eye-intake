@@ -436,11 +436,15 @@ if (isBlocked) {
 
 } else {
 
-  container.innerHTML += `
-    <div class="card" onclick="selectTime(${slotTimestamp}, this)">
-      ${displayLabel}
-    </div>
-  `;
+  const isSelected = selectedTime === slotTimestamp;
+
+container.innerHTML += `
+  <div class="card"
+       onclick="selectTime(${slotTimestamp}, this)"
+       style="${isSelected ? 'background:#cce5ff;' : ''}">
+    ${displayLabel}
+  </div>
+`;
 
 }
   });
