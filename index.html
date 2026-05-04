@@ -443,7 +443,9 @@ if (isBlocked) {
   `;
 
 }
-    async function selectTime(time, el){
+  });
+
+async function selectTime(time, el){
 
   // 🔒 attempt HOLD first
   try {
@@ -484,8 +486,10 @@ if (isBlocked) {
   payBox.style.opacity = "1";
   payBox.style.pointerEvents = "auto";
 }
-  });
 
+
+
+  
 // ================= FLOW =================
 
 function validate(){
