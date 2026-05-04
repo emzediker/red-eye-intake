@@ -400,9 +400,14 @@ const slotTimestamp = slot.getTime();
 
 const now = Date.now();
 
-const match = appointments.find(p =>
+const matches = appointments.filter(p =>
   Math.abs(Number(p.appointmentTime) - slotTimestamp) < 60000
 );
+
+// ✅ prioritize BOOKED over HOLD
+const match =
+  matches.find(p => p.status && p.status.toUpperCase() === "BOOKED") ||
+  matches.find(p => p.status && p.status.toUpperCase() === "HOLD");
 
 let isBlocked = false;
 
