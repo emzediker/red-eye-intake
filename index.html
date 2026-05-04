@@ -408,11 +408,14 @@ let isBlocked = false;
 
 if (match) {
 
-  if (match.status === "BOOKED") {
+  // ✅ BOOKED = always blocked (never expires)
+  if (match.status && match.status.toUpperCase() === "BOOKED") {
     isBlocked = true;
   }
 
-  if (match.status === "HOLD") {
+  // ⏳ HOLD = only blocked if within 5 minutes
+  else if (match.status && match.status.toUpperCase() === "HOLD") {
+
     const holdTime = new Date(match.submittedAt).getTime();
 
     if ((now - holdTime) < (5 * 60 * 1000)) {
@@ -420,7 +423,7 @@ if (match) {
     }
   }
 }
-
+    
 if (isBlocked) {
 
   container.innerHTML += `
