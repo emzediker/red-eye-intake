@@ -388,6 +388,58 @@ ${cb(prefix+"none","None")}
 `;
 }
 
+document.addEventListener("change", function(e){
+
+  // symptoms section
+  if([
+    "redness",
+    "itching",
+    "discharge",
+    "lid",
+    "irritation"
+  ].includes(e.target.id)){
+
+    if(e.target.checked){
+      noneSymptoms.checked = false;
+    }
+  }
+
+  if(e.target.id === "noneSymptoms" && e.target.checked){
+
+    redness.checked = false;
+    itching.checked = false;
+    discharge.checked = false;
+    lid.checked = false;
+    irritation.checked = false;
+  }
+
+  // risk factor section
+  if([
+    "vision",
+    "pain",
+    "light",
+    "trauma",
+    "chemical",
+    "cl"
+  ].includes(e.target.id)){
+
+    if(e.target.checked){
+      noneRF.checked = false;
+    }
+  }
+
+  if(e.target.id === "noneRF" && e.target.checked){
+
+    vision.checked = false;
+    pain.checked = false;
+    light.checked = false;
+    trauma.checked = false;
+    chemical.checked = false;
+    cl.checked = false;
+  }
+
+});
+
 let selectedTime = null;
 
 function generateTimeSlots(){
