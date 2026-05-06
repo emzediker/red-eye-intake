@@ -929,6 +929,9 @@ fetch(SCRIPT_URL)
   .catch(()=>{
     document.getElementById("app").innerHTML="Error loading patients";
   });
+  setInterval(()=>{
+  loadProvider();
+},30000);
 }
 
 function openChart(i){
