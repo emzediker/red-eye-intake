@@ -1039,6 +1039,51 @@ NPI: ${providers[doctorName].npi}
 
 </div>
 `;
+<button onclick="window.print()">Print / Save PDF</button>
+<button onclick="removePatient(${i})">Remove Patient</button>
+
+</div>
+`;
+
+// 🔄 restore draft notes
+const savedAssessment = localStorage.getItem("assessmentDraft");
+const savedPlan = localStorage.getItem("planDraft");
+const savedFollowup = localStorage.getItem("followupDraft");
+
+const textareas = document.querySelectorAll(".soap-section textarea");
+
+if(savedAssessment && textareas[0]){
+  textareas[0].value = savedAssessment;
+}
+
+if(savedPlan && textareas[1]){
+  textareas[1].value = savedPlan;
+}
+
+if(savedFollowup && textareas[2]){
+  textareas[2].value = savedFollowup;
+}
+
+// 💾 autosave every 10 sec
+setInterval(()=>{
+
+  const textareas = document.querySelectorAll(".soap-section textarea");
+
+  if(textareas[0]){
+    localStorage.setItem("assessmentDraft", textareas[0].value);
+  }
+
+  if(textareas[1]){
+    localStorage.setItem("planDraft", textareas[1].value);
+  }
+
+  if(textareas[2]){
+    localStorage.setItem("followupDraft", textareas[2].value);
+  }
+
+},10000);
+
+}
 }
 
 document.addEventListener("change", function(e){
