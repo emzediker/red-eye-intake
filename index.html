@@ -466,6 +466,11 @@ async function selectTime(time, el){
   // 🚫 prevent double click
   if (isSelectingTime) return;
   isSelectingTime = true;
+  document.querySelectorAll("#timeSlots .card").forEach(card=>{
+  card.style.pointerEvents = "none";
+});
+
+  
 
   // 🔄 show loading state
   el.innerHTML = "⏳ Reserving...";
@@ -490,13 +495,15 @@ if(data.status === "taken"){
   el.style.background = "#f8d7da";
 
   isSelectingTime = false;
-  return;
+generateTimeSlots();
+return;
     }
 
   } catch(err){
-    isSelectingTime = false;
-    alert("Error locking time");
-    return;
+ isSelectingTime = false;
+generateTimeSlots();
+alert("Error locking time");
+return;
   }
 
   // ✅ proceed if held
