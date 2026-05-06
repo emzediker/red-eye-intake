@@ -280,29 +280,11 @@ Visits are typically completed within 5–15 minutes.
 `;
 
 // 🔄 restore saved patient info
-const saved = JSON.parse(localStorage.getItem("lastPatient"));
+function loadPatient(){
 
-if(saved){
+localStorage.removeItem("lastPatient");
 
-  patient.name = saved.name || "";
-  patient.phone = saved.phone || "";
-  patient.email = saved.email || "";
-
-  setTimeout(()=>{
-
-    if(document.getElementById("name")){
-      document.getElementById("name").value = saved.name || "";
-    }
-
-    if(document.getElementById("phone")){
-      document.getElementById("phone").value = saved.phone || "";
-    }
-
-    if(document.getElementById("email")){
-      document.getElementById("email").value = saved.email || "";
-    }
-
-  },100);
+document.getElementById("app").innerHTML=`
 }
   
 fetch(SCRIPT_URL)
