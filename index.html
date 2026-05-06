@@ -308,6 +308,17 @@ fetch(SCRIPT_URL)
   .catch(() => {
     generateTimeSlots(); // fallback
   });
+// 🔄 auto-refresh appointment slots
+setInterval(()=>{
+
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      appointments = data;
+      generateTimeSlots();
+    });
+
+},30000);
 }
 
 function handlePayment(){
