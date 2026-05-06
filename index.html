@@ -73,6 +73,8 @@ let bookedTimes = [];
 let doctorName = "Emily Zediker, OD";
 let currentIndex = null;
 let isSelectingTime = false;
+let holdCountdown;
+let holdSeconds = 300;
 
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
@@ -240,6 +242,17 @@ ${medHx("fh_")}
 <div class="step" id="step5">
 
 <h3>Select Appointment Time</h3>
+
+<div id="holdTimer" style="
+  display:none;
+  background:#fff3cd;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:12px;
+  font-weight:bold;
+">
+  ⏳ Reserved for: <span id="timerText">5:00</span>
+</div>
 
 <div id="timeSlots"></div>
 
@@ -524,7 +537,53 @@ return;
   payBox.style.pointerEvents = "auto";
 }
 
+function startHoldTimer(){
 
+  clearInterval(holdCountdown);
+
+  holdSeconds = 300;
+
+  const timerBox = document.getElementById("holdTimer");
+  const timerText = document.getElementById("timerText");
+
+  timerBox.style.display = "block";
+
+  holdCountdown = setInterval(()=>{
+
+    holdSeconds--;
+
+    const minutes = Math.floor(holdSeconds / 60);
+    const seconds = holdSeconds % 60;
+
+    timerText.innerText =
+      `${minutes}:${seconds.toString().padStart(2,"0")}`;
+
+    if(holdSeconds <= 0){
+
+      clearInterval(holdCountdown);
+
+      selectedTime = null;
+
+      timerBox.style.display = "none";
+
+      // disable payment again
+      const payBox = document.getElementById("paymentBox");
+      payBox.style.opacity = "0.5";
+      payBox.style.pointerEvents = "none";
+
+      alert("Your reservation expired.");
+
+      // refresh slots
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          appointments = data;
+          generateTimeSlots();
+        });
+    }
+
+  },1000);
+}
 
   
 // ================= FLOW =================
