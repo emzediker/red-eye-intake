@@ -97,6 +97,9 @@ if(isProvider){
 // ================= PATIENT =================
 
 function loadPatient(){
+
+localStorage.removeItem("lastPatient");
+
 document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step0">
@@ -280,12 +283,7 @@ Visits are typically completed within 5–15 minutes.
 `;
 
 // 🔄 restore saved patient info
-function loadPatient(){
 
-localStorage.removeItem("lastPatient");
-
-document.getElementById("app").innerHTML=`
-}
   
 fetch(SCRIPT_URL)
   .then(res => res.json())
