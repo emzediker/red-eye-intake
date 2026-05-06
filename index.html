@@ -72,6 +72,7 @@ const providers = {
 let bookedTimes = [];
 let doctorName = "Emily Zediker, OD";
 let currentIndex = null;
+let isSelectingTime = false;
 
 
 const isProvider = new URLSearchParams(window.location.search).get("provider")==="1";
@@ -458,7 +459,18 @@ container.innerHTML += `
   });
 }
 
+
+
 async function selectTime(time, el){
+
+  // 🚫 prevent double click
+  if (isSelectingTime) return;
+  isSelectingTime = true;
+
+  // 🔄 show loading state
+  el.innerHTML = "⏳ Reserving...";
+  el.style.background = "#ffeeba";
+  
 
   // 🔒 attempt HOLD first
   try {
@@ -473,10 +485,12 @@ async function selectTime(time, el){
 
     const data = await res.json();
 
-    if(data.status === "taken"){
-      alert("That time was just taken. Please select another.");
-      loadPatient(); // refresh slots
-      return;
+if(data.status === "taken"){
+  el.innerHTML = "❌ Just taken — pick another";
+  el.style.background = "#f8d7da";
+
+  isSelectingTime = false;
+  return;
     }
 
   } catch(err){
