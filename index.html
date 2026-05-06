@@ -508,7 +508,7 @@ let displayLabel = `${dayName} (${fullDate}) - ${timeLabel}`;
 // 🔥 NEW — timestamp comparison
 const slotTimestamp = slot.getTime();
 
-const now = Date.now();
+const currentTime = Date.now();
 
 const matches = appointments.filter(p =>
   Math.abs(Number(p.appointmentTime) - slotTimestamp) < 60000
