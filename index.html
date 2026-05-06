@@ -273,6 +273,32 @@ ${medHx("fh_")}
 <div id="result"></div>
 `;
 
+// 🔄 restore saved patient info
+const saved = JSON.parse(localStorage.getItem("lastPatient"));
+
+if(saved){
+
+  patient.name = saved.name || "";
+  patient.phone = saved.phone || "";
+  patient.email = saved.email || "";
+
+  setTimeout(()=>{
+
+    if(document.getElementById("name")){
+      document.getElementById("name").value = saved.name || "";
+    }
+
+    if(document.getElementById("phone")){
+      document.getElementById("phone").value = saved.phone || "";
+    }
+
+    if(document.getElementById("email")){
+      document.getElementById("email").value = saved.email || "";
+    }
+
+  },100);
+}
+  
 fetch(SCRIPT_URL)
   .then(res => res.json())
   .then(data => {
