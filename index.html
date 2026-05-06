@@ -533,7 +533,7 @@ if (match) {
 
     const holdTime = new Date(match.submittedAt).getTime();
 
-    if ((now - holdTime) < (5 * 60 * 1000)) {
+    if ((currentTime - holdTime) < (5 * 60 * 1000))
       isBlocked = true;
     }
   }
