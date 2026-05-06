@@ -494,12 +494,14 @@ if(data.status === "taken"){
     }
 
   } catch(err){
+    isSelectingTime = false;
     alert("Error locking time");
     return;
   }
 
   // ✅ proceed if held
   selectedTime = time;
+  isSelectingTime = false;
 
   // clear previous selections
   document.querySelectorAll("#timeSlots div").forEach(d=>{
