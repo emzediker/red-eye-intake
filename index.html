@@ -782,6 +782,7 @@ localStorage.setItem("patients", JSON.stringify(all));
 const formData = new URLSearchParams();
 
 formData.append("name", patient.name);
+formData.append("dob", patient.dob);
 formData.append("phone", patient.phone);
 formData.append("email", patient.email);
 formData.append("cc", document.getElementById("cc").value);
@@ -874,6 +875,7 @@ function showPaidScreen(){
     const formData = new URLSearchParams();
 
     formData.append("action", "book");
+    formData.append("dob", last.dob);
     formData.append("name", last.name);
     formData.append("phone", last.phone);
     formData.append("email", last.email);
@@ -990,6 +992,7 @@ ${doctorSelector}
 <h2>Medical Record</h2>
 
 <b>Name:</b> ${p.name}<br>
+<b>DOB:</b> ${p.dob || ""}<br>
 <b>Phone:</b> ${p.phone}<br>
 <b>Appointment:</b> ${new Date(Number(p.appointmentTime)).toLocaleString()}<br>
 <b>Submitted:</b> ${p.submittedAt || ""}
