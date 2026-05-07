@@ -720,13 +720,32 @@ function next(step){
   document.getElementById("step"+step).classList.add("active");
 }
 
+  
 function startIntake(){
 
 const consent = document.getElementById("consentMain");
 
 if(!consent.checked){
-alert("You must agree to the Terms & Conditions to continue.");
-return;
+  alert("You must agree to continue.");
+  return;
+}
+
+const name = document.getElementById("name").value;
+const dob = document.getElementById("dob").value;
+const phone = document.getElementById("phone").value;
+const email = document.getElementById("email").value;
+
+if(!name || !dob || !phone || !email){
+  alert("Please complete all fields.");
+  return;
+}
+
+patient.name = name;
+patient.dob = dob;
+patient.phone = phone;
+patient.email = email;
+
+next(2);
 }
 
 document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
