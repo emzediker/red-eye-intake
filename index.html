@@ -962,20 +962,6 @@ fetch(SCRIPT_URL)
   .catch(()=>{
     document.getElementById("app").innerHTML="Error loading patients";
   });
-if(isProvider){
-
-  loadProvider();
-
-  setInterval(()=>{
-
-    // ONLY refresh queue screen
-    if(currentIndex === null){
-      loadProvider();
-    }
-
-  },30000);
-
-} else {
 
   if(paid){
     showPaidScreen();
