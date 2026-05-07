@@ -104,58 +104,82 @@ document.getElementById("app").innerHTML=`
 
 <div class="step active" id="step0">
 
-<h3>Telehealth Consent</h3>
+<h3>Start Your Virtual Eye Visit</h3>
 
-<div style="background:#fff3cd;padding:12px;border-radius:6px;margin-bottom:15px;font-size:14px;">
+<div style="
+background:#fff3cd;
+padding:14px;
+border-radius:8px;
+margin-bottom:15px;
+font-size:14px;
+line-height:1.5;
+">
 
-<b>Telehealth Terms & Conditions</b><br><br>
+<b>Telehealth Consent</b><br><br>
 
-<div style="max-height:200px;overflow-y:auto;">
+This virtual visit is intended for non-emergency eye conditions in patients located in Texas.
 
-This is a telehealth screening service and not a full in-person eye exam.
+If you are experiencing severe eye pain, sudden vision loss, significant trauma, or chemical injury, seek immediate in-person medical care.
 
-You confirm you are physically located in Texas.
+A licensed optometrist will review your information and determine whether your condition is appropriate for telehealth treatment.
 
-This service is not for emergencies. If you have severe pain, vision loss, or trauma, seek immediate care.
-
-A licensed optometrist will review your information, but some conditions cannot be fully diagnosed via telehealth.
-
-The cost of this visit is $25. If your condition requires in-person care and no treatment is provided, you may be eligible for a refund.
-
-No guarantees are made regarding diagnosis or outcomes.
-
-Your information will be handled in accordance with applicable privacy standards. Electronic communication carries some risk.
-
-You consent to evaluation and treatment via telehealth.
+Visits are self-pay at a cost of $25.
 
 <br><br>
 
-If you have a complaint, contact:
+<input id="name" placeholder="Full Name">
 
-Texas Optometry Board  
-333 Guadalupe St, Suite 2-420  
-Austin, TX 78701  
-(512) 305-8500  
-https://tob.texas.gov
+<input id="dob" type="date">
 
-</div>
+<input id="phone" placeholder="Phone Number">
+
+<input id="email" placeholder="Email Address">
 
 <div class="check-row">
 <input type="checkbox" id="consentMain">
+
 <span>
-I consent to receive SMS messages from <b>Dr. Emily Zediker, Optometrist</b> related to my appointment and care. 
-Message frequency varies. Message & data rates may apply. 
-Reply STOP to opt out, HELP for help. 
-These messages are not for marketing or promotional purposes. 
-I agree to the 
-<a href="privacy.html" target="_blank">Privacy Policy</a> and 
+I consent to receive SMS messages from 
+<b>Dr. Emily Zediker, Optometrist</b> related to my appointment and care.
+Message frequency varies. Message & data rates may apply.
+Reply STOP to opt out.
+
+<br><br>
+
+I agree to the
+<a href="privacy.html" target="_blank">Privacy Policy</a>
+and
 <a href="terms.html" target="_blank">Terms & Conditions</a>.
+
 </span>
+</div>
+
+<div style="
+font-size:12px;
+color:#555;
+margin-top:15px;
+line-height:1.5;
+">
+
+Questions or complaints regarding optometric care may be directed to:
+
+<br><br>
+
+<b>Texas Optometry Board</b><br>
+1801 Congress Ave, Suite 9.300<br>
+Austin, TX 78701-1319<br>
+(512) 305-8500<br>
+
+<a href="https://tob.texas.gov" target="_blank">
+https://tob.texas.gov
+</a>
+
 </div>
 
 <button onclick="startIntake()">Continue</button>
 
 </div>
+
 </div>
 
 <div id="paymentModal" style="
