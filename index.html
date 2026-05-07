@@ -962,9 +962,22 @@ fetch(SCRIPT_URL)
   .catch(()=>{
     document.getElementById("app").innerHTML="Error loading patients";
   });
-  setInterval(()=>{
+  if(isProvider){
   loadProvider();
-},30000);
+
+  setInterval(()=>{
+    loadProvider();
+  },30000);
+
+} else {
+
+  if(paid){
+    showPaidScreen();
+  } else {
+    loadPatient();
+  }
+
+}
 }
 
 function openChart(i){
