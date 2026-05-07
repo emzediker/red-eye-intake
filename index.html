@@ -83,8 +83,27 @@ const isProvider = new URLSearchParams(window.location.search).get("provider")==
 let patient={};
 let paid = new URLSearchParams(window.location.search).get("paid") === "1";
 if(isProvider){
+
   loadProvider();
+
+  setInterval(()=>{
+
+    // only refresh queue page
+    if(currentIndex === null){
+      loadProvider();
+    }
+
+  },30000);
+
 } else {
+
+  if(paid){
+    showPaidScreen();
+  } else {
+    loadPatient();
+  }
+
+}
 
   if(paid){
     showPaidScreen();
