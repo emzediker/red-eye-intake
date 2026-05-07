@@ -950,6 +950,7 @@ fetch(SCRIPT_URL)
       html+=`
       <div class="card" onclick="openChart(${i})">
       <b>${p.name}</b><br>
+      ${p.dob || ""}<br>
       ${p.phone}<br>
       ${new Date(Number(p.appointmentTime)).toLocaleString()}
       </div>`;
