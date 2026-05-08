@@ -574,100 +574,120 @@ container.innerHTML += `
 
 async function selectTime(time, el){
 
-  if(selectedTime === time){
+  // already working
+  if(isSelectingTime) return;
 
-  await fetch(SCRIPT_URL, {
-    method: "POST",
-    body: new URLSearchParams({
-      action: "release",
-      appointmentTime: time
-    })
-  });
-
-  selectedTime = null;
-
-  clearInterval(holdCountdown);
-
-  document.getElementById("holdTimer").style.display = "none";
-
-  const payBox = document.getElementById("paymentBox");
-  payBox.style.opacity = "0.5";
-  payBox.style.pointerEvents = "none";
-
-  fetch(SCRIPT_URL)
-  .then(res => res.json())
-  .then(data => {
-
-    appointments = data;
-
-    generateTimeSlots();
-  });
-
-return;
-  }
-
-  // 🚫 prevent double click
-  if (isSelectingTime) return;
   isSelectingTime = true;
+
+  // disable clicking during transition
   document.querySelectorAll("#timeSlots .card").forEach(card=>{
-  card.style.pointerEvents = "none";
-});
+    card.style.pointerEvents = "none";
+  });
 
-  
-
-  // 🔄 show loading state
+  // loading state
   el.innerHTML = "⏳ Reserving...";
   el.style.background = "#ffeeba";
-  
 
-  // 🔒 attempt HOLD first
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "hold",
-        appointmentTime: time,
-        name: patient.name || "HOLD"
+
+    // 🔥 release OLD hold automatically
+    if(selectedTime && selectedTime !== time){
+
+      await fetch(SCRIPT_URL,{
+        method:"POST",
+        body:new URLSearchParams({
+          action:"release",
+          appointmentTime:selectedTime
+        })
+      });
+
+    }
+
+    // 🔥 deselect same slot
+    if(selectedTime === time){
+
+      await fetch(SCRIPT_URL,{
+        method:"POST",
+        body:new URLSearchParams({
+          action:"release",
+          appointmentTime:time
+        })
+      });
+
+      selectedTime = null;
+
+      clearInterval(holdCountdown);
+
+      document.getElementById("holdTimer").style.display = "none";
+
+      const payBox = document.getElementById("paymentBox");
+      payBox.style.opacity = "0.5";
+      payBox.style.pointerEvents = "none";
+
+      // refresh fresh data
+      const refreshed = await fetch(SCRIPT_URL);
+      appointments = await refreshed.json();
+
+      generateTimeSlots();
+
+      isSelectingTime = false;
+
+      return;
+    }
+
+    // 🔒 reserve NEW slot
+    const res = await fetch(SCRIPT_URL,{
+      method:"POST",
+      body:new URLSearchParams({
+        action:"hold",
+        appointmentTime:time,
+        name:patient.name || "HOLD"
       })
     });
 
     const data = await res.json();
 
-if(data.status === "taken"){
-  el.innerHTML = "❌ Just taken — pick another";
-  el.style.background = "#f8d7da";
+    if(data.status === "taken"){
 
-  isSelectingTime = false;
-generateTimeSlots();
-return;
+      const refreshed = await fetch(SCRIPT_URL);
+      appointments = await refreshed.json();
+
+      generateTimeSlots();
+
+      isSelectingTime = false;
+
+      return;
     }
 
+    // ✅ set selected
+    selectedTime = time;
+
+    startHoldTimer();
+
+    const refreshed = await fetch(SCRIPT_URL);
+    appointments = await refreshed.json();
+
+    generateTimeSlots();
+
+    // unlock payment
+    const payBox = document.getElementById("paymentBox");
+    payBox.style.opacity = "1";
+    payBox.style.pointerEvents = "auto";
+
   } catch(err){
- isSelectingTime = false;
-generateTimeSlots();
-alert("Error locking time");
-return;
+
+    console.error(err);
+
+    alert("Error selecting appointment");
+
   }
 
-  // ✅ proceed if held
-// ✅ proceed if held
-selectedTime = time;
-
-startHoldTimer();
-
-isSelectingTime = false;
-  // clear previous selections
-  document.querySelectorAll("#timeSlots div").forEach(d=>{
-    d.style.background="";
-  });
-
-  el.style.background = "#cce5ff";
-
-  // unlock payment
-  const payBox = document.getElementById("paymentBox");
-  payBox.style.opacity = "1";
-  payBox.style.pointerEvents = "auto";
+  isSelectingTime = false;
 }
+
+  
+
+
 
 function startHoldTimer(){
 
