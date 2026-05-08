@@ -541,7 +541,10 @@ if (match) {
     }
   }
     
-if (isBlocked) {
+// ✅ allow YOUR currently selected hold
+const isMySelectedSlot = selectedTime === slotTimestamp;
+
+if (isBlocked && !isMySelectedSlot) {
 
   container.innerHTML += `
     <div class="card" style="
