@@ -575,70 +575,72 @@ container.innerHTML += `
 
 
 
+
 async function selectTime(time, el){
 
-  // already working
+  // 🚫 prevent spam clicking
   if(isSelectingTime) return;
-
   isSelectingTime = true;
 
-  // disable clicking during transition
-  document.querySelectorAll("#timeSlots .card").forEach(card=>{
-    card.style.pointerEvents = "none";
-  });
+  // ✅ same slot = deselect
+  if(selectedTime === time){
 
-  // loading state
-  el.innerHTML = "⏳ Reserving...";
-  el.style.background = "#ffeeba";
+    selectedTime = null;
 
-  try {
+    clearInterval(holdCountdown);
 
-    // 🔥 release OLD hold automatically
-    if(selectedTime && selectedTime !== time){
+    document.getElementById("holdTimer").style.display = "none";
 
-      await fetch(SCRIPT_URL,{
-        method:"POST",
-        body:new URLSearchParams({
-          action:"release",
-          appointmentTime:selectedTime
-        })
-      });
+    const payBox = document.getElementById("paymentBox");
+    payBox.style.opacity = "0.5";
+    payBox.style.pointerEvents = "none";
 
-    }
+    // instant UI refresh
+    generateTimeSlots();
 
-    // 🔥 deselect same slot
-    if(selectedTime === time){
+    // backend release quietly
+    fetch(SCRIPT_URL,{
+      method:"POST",
+      body:new URLSearchParams({
+        action:"release",
+        appointmentTime:time
+      })
+    });
 
-      await fetch(SCRIPT_URL,{
-        method:"POST",
-        body:new URLSearchParams({
-          action:"release",
-          appointmentTime:time
-        })
-      });
+    isSelectingTime = false;
+    return;
+  }
 
-      selectedTime = null;
+  // ✅ switching slots
+  const previousTime = selectedTime;
 
-      clearInterval(holdCountdown);
+  // instant visual selection
+  selectedTime = time;
 
-      document.getElementById("holdTimer").style.display = "none";
+  generateTimeSlots();
 
-      const payBox = document.getElementById("paymentBox");
-      payBox.style.opacity = "0.5";
-      payBox.style.pointerEvents = "none";
+  startHoldTimer();
 
-      // refresh fresh data
-      const refreshed = await fetch(SCRIPT_URL);
-      appointments = await refreshed.json();
+  const payBox = document.getElementById("paymentBox");
+  payBox.style.opacity = "1";
+  payBox.style.pointerEvents = "auto";
 
-      generateTimeSlots();
+  // quietly release old slot
+  if(previousTime){
 
-      isSelectingTime = false;
+    fetch(SCRIPT_URL,{
+      method:"POST",
+      body:new URLSearchParams({
+        action:"release",
+        appointmentTime:previousTime
+      })
+    });
 
-      return;
-    }
+  }
 
-    // 🔒 reserve NEW slot
+  // hold new slot
+  try{
+
     const res = await fetch(SCRIPT_URL,{
       method:"POST",
       body:new URLSearchParams({
@@ -650,38 +652,24 @@ async function selectTime(time, el){
 
     const data = await res.json();
 
+    // somebody grabbed it first
     if(data.status === "taken"){
 
-      const refreshed = await fetch(SCRIPT_URL);
-      appointments = await refreshed.json();
+      selectedTime = null;
 
       generateTimeSlots();
 
-      isSelectingTime = false;
+      alert("That appointment was just taken.");
 
-      return;
     }
-
-    // ✅ set selected
-    selectedTime = time;
-
-    startHoldTimer();
-
-    const refreshed = await fetch(SCRIPT_URL);
-    appointments = await refreshed.json();
-
-    generateTimeSlots();
-
-    // unlock payment
-    const payBox = document.getElementById("paymentBox");
-    payBox.style.opacity = "1";
-    payBox.style.pointerEvents = "auto";
 
   } catch(err){
 
-    console.error(err);
+    selectedTime = null;
 
-    alert("Error selecting appointment");
+    generateTimeSlots();
+
+    alert("Error reserving slot.");
 
   }
 
