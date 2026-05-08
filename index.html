@@ -594,10 +594,17 @@ async function selectTime(time, el){
   payBox.style.opacity = "0.5";
   payBox.style.pointerEvents = "none";
 
-  generateTimeSlots();
+  fetch(SCRIPT_URL)
+  .then(res => res.json())
+  .then(data => {
 
-  return;
-}
+    appointments = data;
+
+    generateTimeSlots();
+  });
+
+return;
+  }
 
   // 🚫 prevent double click
   if (isSelectingTime) return;
