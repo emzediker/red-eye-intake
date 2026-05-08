@@ -574,6 +574,31 @@ container.innerHTML += `
 
 async function selectTime(time, el){
 
+  if(selectedTime === time){
+
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "release",
+      appointmentTime: time
+    })
+  });
+
+  selectedTime = null;
+
+  clearInterval(holdCountdown);
+
+  document.getElementById("holdTimer").style.display = "none";
+
+  const payBox = document.getElementById("paymentBox");
+  payBox.style.opacity = "0.5";
+  payBox.style.pointerEvents = "none";
+
+  generateTimeSlots();
+
+  return;
+}
+
   // 🚫 prevent double click
   if (isSelectingTime) return;
   isSelectingTime = true;
